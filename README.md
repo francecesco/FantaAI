@@ -4,15 +4,35 @@ Un'applicazione di fantacalcio per la Serie A con React, TypeScript, Express e P
 
 ## 🚀 Avvio Rapido
 
-### Prerequisiti
+### Opzione 1: Docker (Raccomandato per CasaOS) 🐳
+
+```bash
+# Clona il repository
+git clone https://github.com/francecesco/FantaAI.git
+cd FantaAI
+
+# Genera certificati SSL
+./generate-ssl.sh
+
+# Avvia con Docker
+./docker-manager.sh start
+
+# Accedi all'applicazione
+# HTTP:  http://localhost
+# HTTPS: https://localhost
+```
+
+### Opzione 2: Installazione Locale
+
+#### Prerequisiti
 - Node.js 18+
 - PostgreSQL 15+
 - npm
 
-### Installazione
+#### Installazione
 ```bash
 # Clona il repository
-git clone <repository-url>
+git clone https://github.com/francecesco/FantaAI.git
 cd FantaAI
 
 # Installa le dipendenze
@@ -25,14 +45,14 @@ createdb fantaseriea
 npm run db:push
 ```
 
-### Avvio dell'Applicazione
+#### Avvio dell'Applicazione
 
-#### Opzione 1: Script Automatico (Raccomandato)
+##### Script Automatico (Raccomandato)
 ```bash
 ./start.sh
 ```
 
-#### Opzione 2: Manuale
+##### Manuale
 ```bash
 # Assicurati che PostgreSQL sia in esecuzione
 brew services start postgresql@15
@@ -41,7 +61,7 @@ brew services start postgresql@15
 npm run dev
 ```
 
-#### Opzione 3: Con Variabili d'Ambiente
+##### Con Variabili d'Ambiente
 ```bash
 export DATABASE_URL="postgresql://localhost:5432/fantaseriea"
 export PORT=3000
@@ -51,25 +71,88 @@ npm run dev
 ```
 
 ### Fermare l'Applicazione
+
+#### Docker
+```bash
+./docker-manager.sh stop
+```
+
+#### Locale
 ```bash
 ./stop.sh
 ```
 
+## 🏠 CasaOS Deployment
+
+### Installazione Automatica
+1. Apri CasaOS
+2. Vai su "App Store"
+3. Clicca "Import App"
+4. Carica `casaos-config.json`
+
+### Installazione Manuale
+```bash
+# Copia file in CasaOS
+cp -r . /path/to/casaos/apps/fantai/
+
+# Avvia
+docker-compose up -d
+```
+
 ## 🌐 Accesso
-L'applicazione sarà disponibile su: **http://localhost:3000** (o la porta successiva disponibile)
+
+### Docker/CasaOS
+- **HTTP**: http://localhost
+- **HTTPS**: https://localhost
+- **API**: https://localhost/api
+
+### Locale
+- **Applicazione**: http://localhost:3000 (o porta successiva disponibile)
+
+## 📊 Database Unificato
+
+### Statistiche
+- **278 giocatori** Serie A 2025/26
+- **12 squadre** complete
+- **Database unificato** senza duplicati
+- **Organizzazione per ruolo**: P (33), D (89), C (67), A (89)
+
+### Squadre incluse
+- Atalanta, Bologna, Cagliari, Como, Cremonese, Fiorentina
+- Genoa, Inter, Juventus, Lazio, Lecce, Milan
+- Napoli, Parma, Pisa, Roma, Sassuolo, Torino, Udinese, Verona
 
 ## 📁 Struttura del Progetto
 ```
 FantaAI/
-├── client/          # Frontend React + TypeScript
-├── server/          # Backend Express + TypeScript
-├── shared/          # Schema database condiviso
-├── start.sh         # Script di avvio automatico
-├── stop.sh          # Script di stop
-└── .env             # Variabili d'ambiente
+├── client/              # Frontend React + TypeScript
+├── server/              # Backend Express + TypeScript
+├── shared/              # Schema database condiviso
+├── Dockerfile           # Immagine Docker
+├── docker-compose.yml   # Orchestrazione servizi
+├── docker-manager.sh    # Gestione Docker
+├── casaos-config.json   # Configurazione CasaOS
+├── start.sh             # Script di avvio locale
+├── stop.sh              # Script di stop locale
+└── .env                 # Variabili d'ambiente
 ```
 
 ## 🛠️ Comandi Utili
+
+### Docker
+```bash
+./docker-manager.sh start      # Avvia
+./docker-manager.sh stop       # Ferma
+./docker-manager.sh restart    # Riavvia
+./docker-manager.sh status     # Stato
+./docker-manager.sh logs       # Log
+./docker-manager.sh backup     # Backup database
+./docker-manager.sh restore    # Ripristina database
+./docker-manager.sh update     # Aggiorna
+./docker-manager.sh clean      # Pulizia completa
+```
+
+### Locale
 ```bash
 npm run dev          # Avvia in modalità sviluppo
 npm run build        # Build per produzione
@@ -78,23 +161,104 @@ npm run db:push      # Sincronizza schema database
 npm run check        # Controllo TypeScript
 ```
 
-## 🔧 Risoluzione Problemi
+## 🏗️ Architettura
 
-### Porta già in uso
-Lo script `start.sh` trova automaticamente una porta disponibile.
-
-### Database non trovato
-```bash
-createdb fantaseriea
-npm run db:push
+### Docker (CasaOS)
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Nginx (SSL)   │───▶│   FantaAI App   │───▶│   PostgreSQL    │
+│   Porta 80/443  │    │   Porta 3000    │    │   Porta 5432    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-### PostgreSQL non in esecuzione
+### Locale
+```
+┌─────────────────┐    ┌─────────────────┐
+│   FantaAI App   │───▶│   PostgreSQL    │
+│   Porta 3000    │    │   Porta 5432    │
+└─────────────────┘    └─────────────────┘
+```
+
+## 🔐 Sicurezza
+
+### Docker
+- **SSL/TLS** con certificati self-signed
+- **Rate limiting** (10 req/s API, 5 req/min login)
+- **Security headers** configurati
+- **HSTS** abilitato
+- **Health checks** automatici
+
+### Locale
+- **Autenticazione** tramite email Google
+- **Session management** sicuro
+- **CORS** configurato
+
+## 📈 Performance
+
+### Risorse consigliate
+- **CPU**: 1 core minimo, 2 core consigliato
+- **RAM**: 512MB minimo, 1GB consigliato
+- **Storage**: 1GB minimo per database
+
+### Ottimizzazioni
+- **Gzip** compressione
+- **Proxy cache** configurato
+- **Connection pooling** database
+- **Health checks** automatici
+
+## 🔧 Risoluzione Problemi
+
+### Docker
 ```bash
+# Porte occupate
+netstat -tulpn | grep :80
+
+# Database non raggiungibile
+./docker-manager.sh logs postgres
+
+# Certificati SSL
+./docker-manager.sh ssl
+
+# Permessi file
+chmod +x *.sh
+```
+
+### Locale
+```bash
+# Porta già in uso
+# Lo script start.sh trova automaticamente una porta disponibile
+
+# Database non trovato
+createdb fantaseriea
+npm run db:push
+
+# PostgreSQL non in esecuzione
 brew services start postgresql@15
 ```
 
 ## 📝 Note
-- L'applicazione carica automaticamente 155 giocatori e 60 partite dalla Serie A 2025/26
-- Le variabili d'ambiente sono configurate nel file `.env`
-- L'autenticazione è gestita tramite email Google (Gmail, Google Mail, etc.)
+
+### Database
+- **278 giocatori** caricati automaticamente dalla Serie A 2025/26
+- **Database unificato** senza duplicati
+- **Organizzazione per ruolo** (Portieri, Difensori, Centrocampisti, Attaccanti)
+- **Dati aggiornati** al mercato estivo 2025
+
+### Autenticazione
+- **Email Google** (Gmail, Google Mail, etc.)
+- **Session persistenti** (non scadono)
+- **Redirect automatico** al dashboard dopo login
+
+### Deployment
+- **Ottimizzato per CasaOS** ma funziona ovunque
+- **Docker Hub** ready (immagine pubblica disponibile)
+- **Backup automatici** del database
+- **Log persistenti** per debugging
+
+## 🔗 Link Utili
+
+- [Guida Docker Completa](DOCKER_GUIDE.md)
+- [README Docker](README_DOCKER.md)
+- [Documentazione Database](server/DATABASE_UNIFICATO_README.md)
+- [Repository GitHub](https://github.com/francecesco/FantaAI)
+- [CasaOS](https://casaos.io/)
