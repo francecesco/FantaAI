@@ -219,42 +219,42 @@ export class FootballApiService {
 
   private getMockPlayers(): InsertPlayer[] {
     return [
-      // Portieri
-      { name: "Gianluigi Donnarumma", position: "P", team: "PSG", price: 30, rating: "6.9", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Samir Handanović", position: "P", team: "Inter", price: 18, rating: "6.5", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Wojciech Szczęsny", position: "P", team: "Juventus", price: 22, rating: "6.7", goals: 0, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Alex Meret", position: "P", team: "Napoli", price: 12, rating: "6.7", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Mike Maignan", position: "P", team: "Milan", price: 25, rating: "7.1", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 8, isActive: true },
+      // Portieri Serie A
+      { name: "Yann Sommer", position: "P", team: "Inter", price: 22, rating: "7.0", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 20, isActive: true },
+      { name: "Mattia Perin", position: "P", team: "Juventus", price: 18, rating: "6.8", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 15, isActive: true },
+      { name: "Alex Meret", position: "P", team: "Napoli", price: 16, rating: "6.9", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 18, isActive: true },
+      { name: "Mike Maignan", position: "P", team: "Milan", price: 28, rating: "7.3", goals: 0, assists: 1, yellowCards: 0, redCards: 0, matchesPlayed: 22, isActive: true },
+      { name: "Juan Musso", position: "P", team: "Atalanta", price: 14, rating: "6.6", goals: 0, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 16, isActive: true },
 
-      // Difensori
-      { name: "Alessandro Bastoni", position: "D", team: "Inter", price: 35, rating: "7.2", goals: 2, assists: 3, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Fikayo Tomori", position: "D", team: "Milan", price: 28, rating: "6.8", goals: 1, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Kalidou Koulibaly", position: "D", team: "Chelsea", price: 32, rating: "7.0", goals: 1, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Davide Calabria", position: "D", team: "Milan", price: 18, rating: "6.6", goals: 0, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Giorgio Scalvini", position: "D", team: "Atalanta", price: 15, rating: "6.8", goals: 1, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Alessandro Florenzi", position: "D", team: "Milan", price: 12, rating: "6.4", goals: 0, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Gleison Bremer", position: "D", team: "Juventus", price: 30, rating: "7.0", goals: 2, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Rafael Tolói", position: "D", team: "Atalanta", price: 16, rating: "6.7", goals: 1, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
+      // Difensori Serie A
+      { name: "Alessandro Bastoni", position: "D", team: "Inter", price: 38, rating: "7.4", goals: 3, assists: 5, yellowCards: 2, redCards: 0, matchesPlayed: 24, isActive: true },
+      { name: "Fikayo Tomori", position: "D", team: "Milan", price: 25, rating: "6.9", goals: 2, assists: 1, yellowCards: 4, redCards: 0, matchesPlayed: 20, isActive: true },
+      { name: "Kim Min-jae", position: "D", team: "Napoli", price: 35, rating: "7.2", goals: 1, assists: 2, yellowCards: 3, redCards: 0, matchesPlayed: 22, isActive: true },
+      { name: "Davide Calabria", position: "D", team: "Milan", price: 18, rating: "6.7", goals: 1, assists: 3, yellowCards: 5, redCards: 0, matchesPlayed: 19, isActive: true },
+      { name: "Giorgio Scalvini", position: "D", team: "Atalanta", price: 22, rating: "7.0", goals: 2, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 18, isActive: true },
+      { name: "Gleison Bremer", position: "D", team: "Juventus", price: 32, rating: "7.1", goals: 3, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 21, isActive: true },
+      { name: "Mario Rui", position: "D", team: "Napoli", price: 12, rating: "6.4", goals: 0, assists: 2, yellowCards: 6, redCards: 1, matchesPlayed: 17, isActive: true },
+      { name: "Borna Sosa", position: "D", team: "Atalanta", price: 15, rating: "6.8", goals: 1, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 19, isActive: true },
 
-      // Centrocampisti
-      { name: "Nicolò Barella", position: "C", team: "Inter", price: 45, rating: "7.5", goals: 3, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Sandro Tonali", position: "C", team: "Newcastle", price: 38, rating: "7.1", goals: 1, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Lorenzo Pellegrini", position: "C", team: "Roma", price: 40, rating: "7.3", goals: 2, assists: 3, yellowCards: 3, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Khvicha Kvaratskhelia", position: "C", team: "Napoli", price: 25, rating: "7.8", goals: 4, assists: 5, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Matteo Zaccagni", position: "C", team: "Lazio", price: 22, rating: "6.9", goals: 2, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Hakan Çalhanoğlu", position: "C", team: "Inter", price: 35, rating: "7.2", goals: 2, assists: 3, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Sergej Milinković-Savić", position: "C", team: "Al-Hilal", price: 40, rating: "7.4", goals: 3, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Franck Kessié", position: "C", team: "Barcelona", price: 28, rating: "6.8", goals: 1, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8, isActive: true },
+      // Centrocampisti Serie A
+      { name: "Nicolò Barella", position: "C", team: "Inter", price: 48, rating: "7.6", goals: 4, assists: 6, yellowCards: 4, redCards: 0, matchesPlayed: 23, isActive: true },
+      { name: "Marcelo Brozović", position: "C", team: "Inter", price: 35, rating: "7.2", goals: 2, assists: 4, yellowCards: 3, redCards: 0, matchesPlayed: 21, isActive: true },
+      { name: "Lorenzo Pellegrini", position: "C", team: "Roma", price: 32, rating: "7.0", goals: 3, assists: 5, yellowCards: 6, redCards: 0, matchesPlayed: 20, isActive: true },
+      { name: "Khvicha Kvaratskhelia", position: "C", team: "Napoli", price: 45, rating: "8.0", goals: 8, assists: 9, yellowCards: 2, redCards: 0, matchesPlayed: 22, isActive: true },
+      { name: "Matteo Zaccagni", position: "C", team: "Lazio", price: 28, rating: "7.1", goals: 4, assists: 4, yellowCards: 3, redCards: 0, matchesPlayed: 21, isActive: true },
+      { name: "Hakan Çalhanoğlu", position: "C", team: "Inter", price: 38, rating: "7.3", goals: 3, assists: 7, yellowCards: 4, redCards: 0, matchesPlayed: 22, isActive: true },
+      { name: "Piotr Zieliński", position: "C", team: "Napoli", price: 30, rating: "6.9", goals: 2, assists: 6, yellowCards: 2, redCards: 0, matchesPlayed: 19, isActive: true },
+      { name: "Teun Koopmeiners", position: "C", team: "Atalanta", price: 35, rating: "7.2", goals: 5, assists: 4, yellowCards: 3, redCards: 0, matchesPlayed: 20, isActive: true },
 
-      // Attaccanti
-      { name: "Victor Osimhen", position: "A", team: "Napoli", price: 60, rating: "8.2", goals: 12, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Lautaro Martínez", position: "A", team: "Inter", price: 55, rating: "7.9", goals: 10, assists: 3, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Dušan Vlahović", position: "A", team: "Juventus", price: 52, rating: "7.6", goals: 8, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Ciro Immobile", position: "A", team: "Lazio", price: 35, rating: "7.2", goals: 6, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Federico Chiesa", position: "A", team: "Juventus", price: 42, rating: "7.4", goals: 4, assists: 3, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Rafael Leão", position: "A", team: "Milan", price: 48, rating: "7.8", goals: 5, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Nicolò Zaniolo", position: "A", team: "Aston Villa", price: 35, rating: "7.1", goals: 3, assists: 2, yellowCards: 3, redCards: 0, matchesPlayed: 8, isActive: true },
-      { name: "Tammy Abraham", position: "A", team: "Roma", price: 30, rating: "6.9", goals: 4, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8, isActive: true },
+      // Attaccanti Serie A
+      { name: "Victor Osimhen", position: "A", team: "Napoli", price: 65, rating: "8.3", goals: 18, assists: 3, yellowCards: 2, redCards: 0, matchesPlayed: 22, isActive: true },
+      { name: "Lautaro Martínez", position: "A", team: "Inter", price: 58, rating: "8.0", goals: 15, assists: 4, yellowCards: 3, redCards: 0, matchesPlayed: 24, isActive: true },
+      { name: "Dušan Vlahović", position: "A", team: "Juventus", price: 52, rating: "7.6", goals: 12, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 21, isActive: true },
+      { name: "Ciro Immobile", position: "A", team: "Lazio", price: 38, rating: "7.4", goals: 9, assists: 3, yellowCards: 1, redCards: 0, matchesPlayed: 19, isActive: true },
+      { name: "Rafael Leão", position: "A", team: "Milan", price: 50, rating: "7.8", goals: 8, assists: 7, yellowCards: 3, redCards: 0, matchesPlayed: 23, isActive: true },
+      { name: "Romelu Lukaku", position: "A", team: "Roma", price: 45, rating: "7.5", goals: 10, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 18, isActive: true },
+      { name: "Tammy Abraham", position: "A", team: "Roma", price: 25, rating: "6.8", goals: 6, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 17, isActive: true },
+      { name: "Ademola Lookman", position: "A", team: "Atalanta", price: 30, rating: "7.1", goals: 7, assists: 5, yellowCards: 2, redCards: 0, matchesPlayed: 20, isActive: true },
     ];
   }
 
