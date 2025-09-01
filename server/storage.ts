@@ -14,7 +14,7 @@ import {
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc } from "drizzle-orm";
-import { footballApi } from "./football-api";
+import { footballDataService } from "./football-api";
 import type { 
   TeamStats, 
   PlayerRecommendation, 
@@ -76,7 +76,7 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Initialize with API data
-      const playersData = await footballApi.refreshPlayerData();
+      const playersData = await footballDataService.getSerieAPlayers();
       
       for (const playerData of playersData) {
         await db.insert(players).values({
@@ -191,10 +191,10 @@ export class DatabaseStorage implements IStorage {
 
   async refreshPlayersFromAPI(): Promise<void> {
     try {
-      console.log("Aggiornamento dati giocatori da Transfermarkt...");
+      console.log("Aggiornamento dati giocatori da Fantacalcio.it...");
       
-      // Get fresh data from API
-      const playersData = await footballApi.refreshPlayerData();
+      // Get fresh data from Fantacalcio.it
+      const playersData = await footballDataService.getSerieAPlayers();
       
       // Clear existing players
       await db.delete(players);
@@ -218,7 +218,7 @@ export class DatabaseStorage implements IStorage {
         });
       }
       
-      console.log(`Aggiornati ${playersData.length} giocatori Serie A da Transfermarkt`);
+      console.log(`Aggiornati ${playersData.length} giocatori Serie A da Fantacalcio.it`);
     } catch (error) {
       console.error("Failed to refresh player data:", error);
       throw error;

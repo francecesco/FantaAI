@@ -191,7 +191,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.refreshPlayersFromAPI();
       res.json({ message: "Player data refreshed successfully" });
     } catch (error) {
+      console.error("Error refreshing player data:", error);
       res.status(500).json({ message: "Failed to refresh player data" });
+    }
+  });
+
+  // Public endpoint to refresh players (development only)
+  app.post("/api/players/refresh", async (req, res) => {
+    try {
+      await storage.refreshPlayersFromAPI();
+      res.json({ message: "Player data refreshed successfully" });
+    } catch (error) {
+      console.error("Error refreshing player data:", error);
+      res.status(500).json({ message: "Failed to refresh player data", error: error.message });
     }
   });
 
