@@ -1,4 +1,4 @@
-# FantaSerieA 🏆
+# FantaAI 🏆
 
 Un'applicazione di fantacalcio per la Serie A con React, TypeScript, Express e PostgreSQL.
 
@@ -13,7 +13,7 @@ Un'applicazione di fantacalcio per la Serie A con React, TypeScript, Express e P
 ```bash
 # Clona il repository
 git clone <repository-url>
-cd FantaSerieA
+cd FantaAI
 
 # Installa le dipendenze
 npm install
@@ -60,7 +60,7 @@ L'applicazione sarà disponibile su: **http://localhost:3000** (o la porta succe
 
 ## 📁 Struttura del Progetto
 ```
-FantaSerieA/
+FantaAI/
 ├── client/          # Frontend React + TypeScript
 ├── server/          # Backend Express + TypeScript
 ├── shared/          # Schema database condiviso
