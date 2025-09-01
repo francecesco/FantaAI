@@ -1,0 +1,145 @@
+# Configurazione CasaOS per FantaAI
+# Questo file può essere importato in CasaOS per installare FantaAI
+
+{
+  "name": "FantaAI",
+  "description": "Fantacalcio Serie A 2025/26 con database unificato e AI",
+  "version": "1.0.0",
+  "author": "Francesco Negretti",
+  "repository": "https://github.com/francecesco/FantaAI",
+  "category": "Sports",
+  "icon": "https://raw.githubusercontent.com/francecesco/FantaAI/main/icon.png",
+  "screenshots": [
+    "https://raw.githubusercontent.com/francecesco/FantaAI/main/screenshots/dashboard.png",
+    "https://raw.githubusercontent.com/francecesco/FantaAI/main/screenshots/market.png",
+    "https://raw.githubusercontent.com/francecesco/FantaAI/main/screenshots/roster.png"
+  ],
+  "tags": ["fantacalcio", "serie-a", "football", "sports", "ai"],
+  "requirements": {
+    "cpu": "1",
+    "memory": "512",
+    "disk": "1"
+  },
+  "ports": [
+    {
+      "name": "HTTP",
+      "port": 80,
+      "protocol": "http"
+    },
+    {
+      "name": "HTTPS",
+      "port": 443,
+      "protocol": "https"
+    }
+  ],
+  "volumes": [
+    {
+      "name": "Database",
+      "path": "/var/lib/postgresql/data",
+      "description": "Database PostgreSQL"
+    },
+    {
+      "name": "Logs",
+      "path": "/app/logs",
+      "description": "Log dell'applicazione"
+    },
+    {
+      "name": "Uploads",
+      "path": "/app/uploads",
+      "description": "File caricati"
+    }
+  ],
+  "environment": [
+    {
+      "name": "POSTGRES_DB",
+      "value": "fantaseriea",
+      "description": "Nome database PostgreSQL"
+    },
+    {
+      "name": "POSTGRES_USER",
+      "value": "postgres",
+      "description": "Utente database PostgreSQL"
+    },
+    {
+      "name": "POSTGRES_PASSWORD",
+      "value": "postgres",
+      "description": "Password database PostgreSQL"
+    },
+    {
+      "name": "NODE_ENV",
+      "value": "production",
+      "description": "Ambiente Node.js"
+    }
+  ],
+  "services": [
+    {
+      "name": "postgres",
+      "image": "postgres:15-alpine",
+      "restart": "unless-stopped",
+      "environment": [
+        "POSTGRES_DB=fantaseriea",
+        "POSTGRES_USER=postgres",
+        "POSTGRES_PASSWORD=postgres"
+      ],
+      "volumes": [
+        "postgres_data:/var/lib/postgresql/data"
+      ],
+      "healthcheck": {
+        "test": ["CMD-SHELL", "pg_isready -U postgres"],
+        "interval": "10s",
+        "timeout": "5s",
+        "retries": 5
+      }
+    },
+    {
+      "name": "fantai",
+      "image": "francecesco/fantai:latest",
+      "restart": "unless-stopped",
+      "depends_on": [
+        "postgres"
+      ],
+      "environment": [
+        "POSTGRES_HOST=postgres",
+        "POSTGRES_PORT=5432",
+        "POSTGRES_USER=postgres",
+        "POSTGRES_PASSWORD=postgres",
+        "POSTGRES_DB=fantaseriea",
+        "NODE_ENV=production"
+      ],
+      "volumes": [
+        "logs:/app/logs",
+        "uploads:/app/uploads"
+      ],
+      "healthcheck": {
+        "test": ["CMD", "curl", "-f", "http://localhost:3000/api/health"],
+        "interval": "30s",
+        "timeout": "10s",
+        "retries": 3,
+        "start_period": "40s"
+      }
+    },
+    {
+      "name": "nginx",
+      "image": "nginx:alpine",
+      "restart": "unless-stopped",
+      "depends_on": [
+        "fantai"
+      ],
+      "volumes": [
+        "./nginx.conf:/etc/nginx/nginx.conf:ro",
+        "./ssl:/etc/nginx/ssl:ro"
+      ]
+    }
+  ],
+  "volumes": {
+    "postgres_data": {
+      "driver": "local"
+    },
+    "logs": {
+      "driver": "local"
+    },
+    "uploads": {
+      "driver": "local"
+    }
+  }
+}
