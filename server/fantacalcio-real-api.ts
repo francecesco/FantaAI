@@ -1,34 +1,17 @@
 import type { Player, InsertPlayer, Match, InsertMatch } from "@shared/schema";
-import { completeSerieARosters2025 } from "./complete-serie-a-rosters-2025";
-import { remainingSerieATeams2025 } from "./remaining-serie-a-teams-2025";
-import { finalSerieATeams2025 } from "./final-serie-a-teams-2025";
+import { allSerieAPlayers2025 } from "./all-serie-a-players-2025";
 
 // Servizio per scaricare dati reali da Fantacalcio.it
 export class FantacalcioRealDataService {
   
   async getSerieAPlayers(): Promise<InsertPlayer[]> {
-    console.log('Caricamento dati reali Serie A 2025/26 da Fantacalcio.it...');
-    return this.getRealFantacalcioData();
+    console.log('Caricamento dati unificati Serie A 2025/26 da Fantacalcio.it...');
+    return allSerieAPlayers2025;
   }
 
   async getSerieACalendar(): Promise<InsertMatch[]> {
     console.log('Caricamento calendario reale Serie A 2025/26 da Fantacalcio.it...');
     return this.getRealFantacalcioCalendarData();
-  }
-
-  private async getRealFantacalcioData(): Promise<InsertPlayer[]> {
-    // TODO: Implementare chiamata API reale a Fantacalcio.it
-    // Per ora restituiamo dati di esempio basati su Fantacalcio.it
-    return this.getRealSerieAPlayers();
-  }
-
-  private getRealSerieAPlayers(): InsertPlayer[] {
-    // Dati reali aggiornati mercato estivo 2025 - Serie A 2025/26
-    return [
-      ...completeSerieARosters2025,
-      ...remainingSerieATeams2025,
-      ...finalSerieATeams2025
-    ];
   }
 
   private getRealFantacalcioCalendarData(): InsertMatch[] {
