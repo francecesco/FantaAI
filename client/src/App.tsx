@@ -11,6 +11,7 @@ import Stats from "@/pages/stats";
 import Simulation from "@/pages/simulation";
 import Calendar from "@/pages/calendar";
 import Landing from "@/pages/landing";
+import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,10 +20,15 @@ function Router() {
   return (
     <Switch>
       {isLoading || !isAuthenticated ? (
-        <Route path="/" component={Landing} />
+        <>
+          <Route path="/" component={Landing} />
+          <Route path="/login" component={Login} />
+          <Route path="/dashboard" component={Login} />
+        </>
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/dashboard" component={Dashboard} />
           <Route path="/roster" component={Roster} />
           <Route path="/market" component={Market} />
           <Route path="/stats" component={Stats} />

@@ -608,4 +608,375 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// MemStorage implementation for when database is offline
+export class MemStorage implements IStorage {
+  private users: User[] = [];
+  private playersData: Player[] = [];
+  private userTeamsData: UserTeam[] = [];
+  private transactionsData: Transaction[] = [];
+  private calendarData: Match[] = [];
+  private initialized = false;
+
+  constructor() {
+    this.initializeData();
+  }
+
+  private async initializeData() {
+    if (this.initialized) return;
+    
+    try {
+      // Initialize players from API
+      const apiPlayers = await footballDataService.getSerieAPlayers();
+      this.playersData = apiPlayers.map(p => ({
+        id: randomUUID(),
+        name: p.name,
+        position: p.position,
+        team: p.team,
+        price: p.price,
+        rating: p.rating.toString(),
+        goals: p.goals || 0,
+        assists: p.assists || 0,
+        yellowCards: p.yellowCards || 0,
+        redCards: p.redCards || 0,
+        matchesPlayed: p.matchesPlayed || 0,
+        isActive: true,
+      }));
+
+      // Initialize calendar data
+      const apiCalendar = await footballDataService.getSerieACalendar();
+      this.calendarData = apiCalendar.map(m => ({
+        id: randomUUID(),
+        ...m,
+      }));
+
+      this.initialized = true;
+      console.log(`Initialized ${this.playersData.length} players and ${this.calendarData.length} matches in memory`);
+    } catch (error) {
+      console.error('Error initializing memory storage:', error);
+    }
+  }
+
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.find(u => u.id === id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.users.find(u => u.username === username);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(u => u.email === email);
+  }
+
+  async createUser(userData: Omit<User, 'id' | 'totalCredits' | 'createdAt' | 'updatedAt'>): Promise<User> {
+    const user: User = {
+      ...userData,
+      id: randomUUID(),
+      totalCredits: 500,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.push(user);
+    return user;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existingIndex = this.users.findIndex(u => u.id === userData.id);
+    const user: User = {
+      ...userData,
+      username: userData.username || userData.email?.split("@")[0] || `user_${userData.id}`,
+      totalCredits: userData.totalCredits || 500,
+      createdAt: userData.createdAt || new Date(),
+      updatedAt: new Date(),
+    };
+
+    if (existingIndex >= 0) {
+      this.users[existingIndex] = user;
+    } else {
+      this.users.push(user);
+    }
+    return user;
+  }
+
+  async updateUserCredits(userId: string, credits: number): Promise<void> {
+    const user = this.users.find(u => u.id === userId);
+    if (user) {
+      user.totalCredits = credits;
+      user.updatedAt = new Date();
+    }
+  }
+
+  async getAllPlayers(): Promise<Player[]> {
+    await this.initializeData();
+    return this.playersData.filter(p => p.isActive);
+  }
+
+  async getPlayerById(id: string): Promise<Player | undefined> {
+    await this.initializeData();
+    return this.playersData.find(p => p.id === id);
+  }
+
+  async searchPlayers(query: string, position?: string, minPrice?: number, maxPrice?: number): Promise<Player[]> {
+    await this.initializeData();
+    let results = this.playersData.filter(p => p.isActive);
+    
+    if (query) {
+      results = results.filter(p => 
+        p.name.toLowerCase().includes(query.toLowerCase()) ||
+        p.team.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    
+    if (position) {
+      results = results.filter(p => p.position === position);
+    }
+    
+    if (minPrice !== undefined) {
+      results = results.filter(p => p.price >= minPrice);
+    }
+    
+    if (maxPrice !== undefined) {
+      results = results.filter(p => p.price <= maxPrice);
+    }
+
+    return results;
+  }
+
+  async getPlayersByPosition(position: string): Promise<Player[]> {
+    await this.initializeData();
+    return this.playersData.filter(p => p.position === position && p.isActive);
+  }
+
+  async refreshPlayersFromAPI(): Promise<void> {
+    try {
+      const playersData = await footballDataService.getSerieAPlayers();
+      this.playersData = playersData.map(p => ({
+        id: randomUUID(),
+        name: p.name,
+        position: p.position,
+        team: p.team,
+        price: p.price,
+        rating: p.rating.toString(),
+        goals: p.goals || 0,
+        assists: p.assists || 0,
+        yellowCards: p.yellowCards || 0,
+        redCards: p.redCards || 0,
+        matchesPlayed: p.matchesPlayed || 0,
+        isActive: true,
+      }));
+      console.log(`Refreshed ${this.playersData.length} players from API`);
+    } catch (error) {
+      console.error("Failed to refresh player data:", error);
+      throw error;
+    }
+  }
+
+  async getUserTeam(userId: string): Promise<UserTeam[]> {
+    return this.userTeamsData.filter(ut => ut.userId === userId);
+  }
+
+  async addPlayerToTeam(userTeam: InsertUserTeam): Promise<UserTeam> {
+    const team: UserTeam = {
+      ...userTeam,
+      id: randomUUID(),
+      createdAt: new Date(),
+    };
+    this.userTeamsData.push(team);
+    return team;
+  }
+
+  async removePlayerFromTeam(userId: string, playerId: string): Promise<void> {
+    this.userTeamsData = this.userTeamsData.filter(
+      ut => !(ut.userId === userId && ut.playerId === playerId)
+    );
+  }
+
+  async getUserTeamStats(userId: string): Promise<TeamStats> {
+    const team = await this.getUserTeam(userId);
+    const user = await this.getUser(userId);
+    
+    let totalGoals = 0;
+    let totalAssists = 0;
+    let totalRating = 0;
+    let spentCredits = 0;
+    
+    for (const ut of team) {
+      const player = await this.getPlayerById(ut.playerId);
+      if (player) {
+        totalGoals += player.goals;
+        totalAssists += player.assists;
+        totalRating += parseFloat(player.rating);
+        spentCredits += ut.purchasePrice;
+      }
+    }
+
+    return {
+      playerCount: team.length,
+      totalGoals,
+      totalAssists,
+      averageRating: team.length > 0 ? totalRating / team.length : 0,
+      spentCredits,
+      remainingCredits: (user?.totalCredits || 500) - spentCredits,
+    };
+  }
+
+  async createTransaction(transaction: InsertTransaction): Promise<Transaction> {
+    const tx: Transaction = {
+      ...transaction,
+      id: randomUUID(),
+      createdAt: new Date(),
+    };
+    this.transactionsData.push(tx);
+    return tx;
+  }
+
+  async getUserTransactions(userId: string): Promise<Transaction[]> {
+    return this.transactionsData
+      .filter(t => t.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getPlayerRecommendations(userId: string): Promise<PlayerRecommendation[]> {
+    await this.initializeData();
+    const userTeamData = await this.getUserTeam(userId);
+    const ownedPlayerIds = new Set(userTeamData.map(ut => ut.playerId));
+    const teamStats = await this.getUserTeamStats(userId);
+    
+    const availablePlayers = this.playersData.filter(p => !ownedPlayerIds.has(p.id) && p.isActive);
+
+    const recommendations = availablePlayers
+      .map(player => {
+        const valueScore = this.calculateBeginnerValueScore(player, userTeamData, teamStats);
+        return {
+          player,
+          valueScore,
+          reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
+        };
+      })
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 8);
+
+    return recommendations;
+  }
+
+  private calculateBeginnerValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
+    const rating = parseFloat(player.rating);
+    
+    let score = rating * 10;
+    score += (player.goals + player.assists) * 5;
+    
+    if (player.matchesPlayed >= 15) score += 20;
+    if (player.price > 40) score -= 30;
+    else if (player.price > 25) score -= 10;
+    if (rating >= 7.0 && player.price <= 20) score += 25;
+    if (rating >= 6.5 && player.price <= 10) score += 15;
+    
+    const positionNeed = this.getBeginnerPositionNeed(player.position, userTeam);
+    score *= positionNeed;
+    
+    return Math.max(score, 0);
+  }
+
+  private getBeginnerPositionNeed(position: string, userTeam: UserTeam[]): number {
+    const currentCounts = { P: 0, D: 0, C: 0, A: 0 };
+    const targetCounts = { P: 3, D: 8, C: 8, A: 6 };
+    const currentCount = currentCounts[position as keyof typeof currentCounts] || 0;
+    const targetCount = targetCounts[position as keyof typeof targetCounts] || 0;
+    
+    if (currentCount === 0) return 2.0;
+    if (currentCount < Math.ceil(targetCount * 0.4)) return 1.8;
+    if (currentCount < targetCount) return 1.3;
+    return 0.7;
+  }
+
+  private generateBeginnerRecommendationReason(player: Player, userTeam: UserTeam[], teamStats: TeamStats): string {
+    const rating = parseFloat(player.rating);
+    const positionNames = { P: "Portiere", D: "Difensore", C: "Centrocampista", A: "Attaccante" };
+    
+    if (rating >= 7.5 && player.price <= 35) {
+      return `🌟 CAMPIONE ACCESSIBILE: ${player.name} è top player ma costa "solo" ${player.price}FM! Voto ${rating} garantito.`;
+    } 
+    if (rating >= 7.0 && player.price <= 20) {
+      return `💎 AFFARE INCREDIBILE: ${player.name} vale molto di più! Voto ${rating} a ${player.price}FM. Ha fatto ${player.goals} gol e ${player.assists} assist.`;
+    } 
+    if (player.price <= 8 && rating >= 6.0) {
+      return `🎯 PERFETTO PER BUDGET: ${player.name} costa pochissimo (${player.price}FM) ma è affidabile (voto ${rating}).`;
+    }
+    
+    return `📈 BUONA SCELTA: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} solido. Voto ${rating}, ${player.goals} gol stagionali.`;
+  }
+
+  async getMarketActivity(): Promise<MarketActivity[]> {
+    return [
+      {
+        id: randomUUID(),
+        playerName: "Rafael Leão",
+        fromTeam: "Milan",
+        toTeam: "Chelsea", 
+        price: 48,
+        timestamp: new Date(Date.now() - 2 * 60 * 1000),
+      },
+      {
+        id: randomUUID(),
+        playerName: "Nicolò Zaniolo",
+        fromTeam: "Roma",
+        toTeam: "Aston Villa",
+        price: 35,
+        timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      },
+    ];
+  }
+
+  async getFormations(userId: string): Promise<Formation[]> {
+    return [
+      {
+        id: "formation-1",
+        userId,
+        name: "Formazione Principale",
+        formation: "3-5-2",
+        playerIds: [],
+        isActive: true,
+        createdAt: new Date(),
+      },
+    ];
+  }
+
+  async saveFormation(userId: string, formationData: Omit<Formation, 'id' | 'userId' | 'createdAt'>): Promise<Formation> {
+    const formation: Formation = {
+      id: Date.now().toString(),
+      userId,
+      ...formationData,
+      createdAt: new Date(),
+    };
+    return formation;
+  }
+
+  async getLeagueStandings(): Promise<LeagueStanding[]> {
+    return [
+      {
+        position: 1,
+        userId: "user1",
+        username: "FantaExpert",
+        totalPoints: 125,
+        matchesPlayed: 5,
+        wins: 4,
+        draws: 1,
+        losses: 0,
+      },
+    ];
+  }
+
+  async getSerieACalendar(): Promise<Match[]> {
+    if (this.calendarData.length === 0) {
+      const calendarData = await footballDataService.getSerieACalendar();
+      this.calendarData = calendarData.map(m => ({
+        id: randomUUID(),
+        ...m,
+      }));
+    }
+    return this.calendarData.sort((a, b) => a.round - b.round || a.date.getTime() - b.date.getTime());
+  }
+}
+
+// Usa MemStorage quando il database non è disponibile
+export const storage = new MemStorage();

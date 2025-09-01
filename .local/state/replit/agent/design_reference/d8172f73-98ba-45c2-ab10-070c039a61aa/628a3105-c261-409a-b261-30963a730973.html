@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantacalcio Serie A - Gestionale Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/heroicons@2.0.18/24/outline/index.js" type="module"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    popover: {
+                        DEFAULT: "var(--popover)",
+                        foreground: "var(--popover-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                    chart: {
+                        "1": "var(--chart-1)",
+                        "2": "var(--chart-2)",
+                        "3": "var(--chart-3)",
+                        "4": "var(--chart-4)",
+                        "5": "var(--chart-5)",
+                    }
+                },
+                fontFamily: {
+                    sans: ["var(--font-sans)"],
+                    serif: ["var(--font-serif)"],
+                    mono: ["var(--font-mono)"],
+                }
+            },
+        }
+    };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 20% 98%);
+            --foreground: hsl(220 9% 15%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(220 9% 15%);
+            --popover: hsl(0 0% 100%);
+            --popover-foreground: hsl(220 9% 15%);
+            --primary: hsl(147 86% 19%);
+            --primary-foreground: hsl(0 0% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(220 9% 15%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(220 9% 46%);
+            --accent: hsl(354 70% 54%);
+            --accent-foreground: hsl(0 0% 98%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 98%);
+            --border: hsl(220 13% 91%);
+            --input: hsl(220 13% 91%);
+            --ring: hsl(147 86% 19%);
+            --radius: 0.5rem;
+            --chart-1: hsl(12 76% 61%);
+            --chart-2: hsl(173 58% 39%);
+            --chart-3: hsl(197 37% 24%);
+            --chart-4: hsl(43 74% 66%);
+            --chart-5: hsl(27 87% 67%);
+            --font-sans: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--background);
+            color: var(--foreground);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, hsl(147 86% 19%) 0%, hsl(147 60% 25%) 100%);
+        }
+
+        .flag-accent {
+            background: linear-gradient(to right, hsl(147 86% 19%) 33%, hsl(0 0% 100%) 33%, hsl(0 0% 100%) 66%, hsl(354 70% 54%) 66%);
+            height: 4px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-background">
+    <!-- @COMPONENT: Header [Navigation and user profile] -->
+    <header class="bg-card shadow-sm border-b border-border">
+        <div class="flag-accent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-primary-foreground" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-xl font-bold text-foreground">Fantacalcio Serie A</h1>
+                    </div>
+                </div>
+                
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="text-primary font-medium border-b-2 border-primary px-1 pb-2">Dashboard</a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground px-1 pb-2">Rosa</a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground px-1 pb-2">Mercato</a>
+                    <a href="#" class="text-muted-foreground hover:text-foreground px-1 pb-2">Statistiche</a>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <!-- User Profile -->
+                    <div class="flex items-center space-x-2">
+                        <!-- Stylized Italian soccer player silhouette -->
+                        <img src="https://images.unsplash.com/photo-1560272564-c83b66b1ad12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&h=100" alt="Profile" class="w-8 h-8 rounded-full" />
+                        <span class="text-sm font-medium text-foreground hidden sm:block" data-bind="user.name">Marco Rossi</span>
+                    </div>
+                    
+                    <!-- Credits Display -->
+                    <div class="bg-muted px-3 py-1 rounded-full">
+                        <span class="text-sm font-semibold text-primary" data-bind="user.credits">€250</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- @COMPONENT: Dashboard Overview [Main stats and quick actions] -->
+        <div class="mb-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-foreground">Dashboard</h2>
+                    <p class="text-muted-foreground mt-1">Gestisci la tua squadra per la Serie A 2024/25</p>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors" data-event="click:handleAddPlayer">
+                        Aggiungi Giocatore
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-muted-foreground">Giocatori in Rosa</p>
+                            <p class="text-2xl font-bold text-foreground" data-bind="team.playerCount">18</p>
+                        </div>
+                        <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-sm">
+                            <span class="text-chart-2 font-medium">Max: 25</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-muted-foreground">Crediti Residui</p>
+                            <p class="text-2xl font-bold text-foreground" data-bind="team.remainingCredits">€250</p>
+                        </div>
+                        <div class="w-12 h-12 bg-chart-1/10 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-chart-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-sm">
+                            <span class="text-muted-foreground">Spesi: </span>
+                            <span class="text-accent font-medium ml-1" data-bind="team.spentCredits">€250</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-muted-foreground">Media Voti</p>
+                            <p class="text-2xl font-bold text-foreground" data-bind="team.averageRating">6.8</p>
+                        </div>
+                        <div class="w-12 h-12 bg-chart-2/10 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-chart-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-sm">
+                            <span class="text-chart-2 font-medium">↑ +0.3 vs scorsa giornata</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-muted-foreground">Punteggio Totale</p>
+                            <p class="text-2xl font-bold text-foreground" data-bind="team.totalScore">127.5</p>
+                        </div>
+                        <div class="w-12 h-12 bg-chart-4/10 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-chart-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center text-sm">
+                            <span class="text-muted-foreground">Giornata 8</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: Dashboard Overview -->
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <!-- @COMPONENT: TeamRoster [Current team display by position] -->
+            <div class="xl:col-span-2">
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-foreground">La Mia Rosa</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md font-medium">Tutti</button>
+                            <button class="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-md hover:bg-secondary">P</button>
+                            <button class="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-md hover:bg-secondary">D</button>
+                            <button class="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-md hover:bg-secondary">C</button>
+                            <button class="px-3 py-1 text-sm bg-muted text-muted-foreground rounded-md hover:bg-secondary">A</button>
+                        </div>
+                    </div>
+
+                    <!-- Position: Portieri -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Portieri (3)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- @MAP: goalkeepers.map(player => ( -->
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A professional soccer goalkeeper in action during a Serie A match -->
+                                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Donnarumma</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€30</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Paris SG</span>
+                                            <span data-bind="player.rating">6.9</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A professional soccer goalkeeper in action during a Serie A match -->
+                                    <img src="https://images.unsplash.com/photo-1577223625816-7546f13df25d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Handanović</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€18</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Inter</span>
+                                            <span data-bind="player.rating">6.5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A professional soccer goalkeeper in action during a Serie A match -->
+                                    <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Szczesny</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€22</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Juventus</span>
+                                            <span data-bind="player.rating">6.7</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                    </div>
+
+                    <!-- Position: Difensori -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Difensori (8)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- @MAP: defenders.map(player => ( -->
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A defender making a tackle during an intense match -->
+                                    <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Bastoni</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€35</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Inter</span>
+                                            <span data-bind="player.rating">7.2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A defender making a tackle during an intense match -->
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Tomori</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€28</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Milan</span>
+                                            <span data-bind="player.rating">6.8</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A defender making a tackle during an intense match -->
+                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Koulibaly</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€32</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Napoli</span>
+                                            <span data-bind="player.rating">7.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button class="text-sm text-primary hover:text-primary/80 font-medium">Mostra tutti i difensori (5 rimanenti)</button>
+                        </div>
+                    </div>
+
+                    <!-- Position: Centrocampisti -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Centrocampisti (8)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- @MAP: midfielders.map(player => ( -->
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A midfielder controlling the ball during a match -->
+                                    <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Barella</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€45</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Inter</span>
+                                            <span data-bind="player.rating">7.5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A midfielder controlling the ball during a match -->
+                                    <img src="https://pixabay.com/get/ged3cd68d29539b502f4e488edace13d491d20d6fe61efda118df97dcd008e603abdb1bf8a34c6fbd102e19ed7716a9545e416bc4d552beafd6d1d1677b7be1bf_1280.jpg" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Tonali</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€38</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Milan</span>
+                                            <span data-bind="player.rating">7.1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A midfielder controlling the ball during a match -->
+                                    <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Pellegrini</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€40</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Roma</span>
+                                            <span data-bind="player.rating">7.3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button class="text-sm text-primary hover:text-primary/80 font-medium">Mostra tutti i centrocampisti (5 rimanenti)</button>
+                        </div>
+                    </div>
+
+                    <!-- Position: Attaccanti -->
+                    <div>
+                        <h4 class="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Attaccanti (6)</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- @MAP: forwards.map(player => ( -->
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A striker celebrating a goal in front of passionate fans -->
+                                    <img src="https://images.unsplash.com/photo-1564078516393-cf04bd966897?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Osimhen</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€60</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Napoli</span>
+                                            <span data-bind="player.rating">8.2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A striker celebrating a goal in front of passionate fans -->
+                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Lautaro</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€55</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Inter</span>
+                                            <span data-bind="player.rating">7.9</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-muted/50 p-4 rounded-lg border border-border hover:shadow-md transition-shadow" data-mock="true">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A striker celebrating a goal in front of passionate fans -->
+                                    <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <h5 class="font-medium text-foreground" data-bind="player.name">Vlahović</h5>
+                                            <span class="text-sm font-bold text-primary" data-bind="player.price">€52</span>
+                                        </div>
+                                        <div class="flex items-center justify-between text-sm text-muted-foreground">
+                                            <span data-bind="player.team">Juventus</span>
+                                            <span data-bind="player.rating">7.6</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button class="text-sm text-primary hover:text-primary/80 font-medium">Mostra tutti gli attaccanti (3 rimanenti)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: TeamRoster -->
+
+            <!-- @COMPONENT: RecommendationsAndMarket [Player recommendations and market info] -->
+            <div class="space-y-8">
+                <!-- Player Recommendations -->
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-foreground">Consigli AI</h3>
+                        <span class="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full font-medium">Aggiornato</span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- @MAP: recommendations.map(player => ( -->
+                        <div class="border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors" data-mock="true">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A promising young Serie A player during training -->
+                                    <img src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=48&h=48" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div>
+                                        <h4 class="font-medium text-foreground" data-bind="recommendation.playerName">Kvara</h4>
+                                        <span class="text-sm text-muted-foreground" data-bind="recommendation.position">C - Napoli</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-bold text-primary" data-bind="recommendation.price">€25</span>
+                                    <div class="text-xs text-chart-2 font-medium">↑ 87% valore</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-muted-foreground mb-3" data-bind="recommendation.reason">
+                                Media voto 7.8, 3 gol e 4 assist. Ottimo rapporto qualità-prezzo per un titolare.
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleAddRecommendedPlayer">
+                                Aggiungi alla Rosa
+                            </button>
+                        </div>
+
+                        <div class="border border-border rounded-lg p-4 hover:bg-muted/30 transition-colors" data-mock="true">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A promising young Serie A player during training -->
+                                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=48&h=48" alt="Player" class="w-12 h-12 rounded-full object-cover" />
+                                    <div>
+                                        <h4 class="font-medium text-foreground" data-bind="recommendation.playerName">Scalvini</h4>
+                                        <span class="text-sm text-muted-foreground" data-bind="recommendation.position">D - Atalanta</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-bold text-primary" data-bind="recommendation.price">€15</span>
+                                    <div class="text-xs text-chart-2 font-medium">↑ 92% valore</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-muted-foreground mb-3" data-bind="recommendation.reason">
+                                Giovane talento, titolare fisso. Ottimo per il futuro e bonus juventus.
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleAddRecommendedPlayer">
+                                Aggiungi alla Rosa
+                            </button>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+
+                <!-- Market Activity -->
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Mercato Live</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- @MAP: marketActivity.map(activity => ( -->
+                        <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0" data-mock="true">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-chart-2 rounded-full"></div>
+                                <div>
+                                    <span class="text-sm font-medium text-foreground" data-bind="activity.playerName">Leão</span>
+                                    <div class="text-xs text-muted-foreground">Milan → Roma</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-accent" data-bind="activity.price">€48M</div>
+                                <div class="text-xs text-muted-foreground">2 min fa</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0" data-mock="true">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-chart-1 rounded-full"></div>
+                                <div>
+                                    <span class="text-sm font-medium text-foreground" data-bind="activity.playerName">Zaniolo</span>
+                                    <div class="text-xs text-muted-foreground">Roma → Juventus</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-accent" data-bind="activity.price">€35M</div>
+                                <div class="text-xs text-muted-foreground">5 min fa</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between py-2 border-b border-border last:border-b-0" data-mock="true">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 bg-chart-4 rounded-full"></div>
+                                <div>
+                                    <span class="text-sm font-medium text-foreground" data-bind="activity.playerName">Milinkovic</span>
+                                    <div class="text-xs text-muted-foreground">Lazio → Al-Hilal</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm font-bold text-accent" data-bind="activity.price">€40M</div>
+                                <div class="text-xs text-muted-foreground">8 min fa</div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-border">
+                        <button class="w-full text-sm text-primary hover:text-primary/80 font-medium">
+                            Vedi tutti i trasferimenti
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <h3 class="text-lg font-semibold text-foreground mb-4">Statistiche Rapide</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Top Marcatore</span>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-foreground" data-bind="stats.topScorer.name">Osimhen</div>
+                                <div class="text-xs text-muted-foreground" data-bind="stats.topScorer.goals">12 gol</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Miglior Assist</span>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-foreground" data-bind="stats.topAssist.name">Kvara</div>
+                                <div class="text-xs text-muted-foreground" data-bind="stats.topAssist.assists">8 assist</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-muted-foreground">Miglior Media</span>
+                            <div class="text-right">
+                                <div class="text-sm font-medium text-foreground" data-bind="stats.topRating.name">Barella</div>
+                                <div class="text-xs text-muted-foreground" data-bind="stats.topRating.rating">7.8</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: RecommendationsAndMarket -->
+        </div>
+
+        <!-- @COMPONENT: PlayerSearch [Search and filter interface] -->
+        <div class="mt-8 bg-card p-6 rounded-xl shadow-sm border border-border">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+                <h3 class="text-xl font-semibold text-foreground mb-4 lg:mb-0">Ricerca Giocatori</h3>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Cerca per nome o squadra..." 
+                            class="w-full sm:w-64 px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none"
+                            data-implementation="Should filter players as user types"
+                        />
+                        <svg class="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    
+                    <select class="px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none" data-implementation="Should filter by position">
+                        <option>Tutti i ruoli</option>
+                        <option>Portiere</option>
+                        <option>Difensore</option>
+                        <option>Centrocampista</option>
+                        <option>Attaccante</option>
+                    </select>
+                    
+                    <select class="px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none" data-implementation="Should filter by price range">
+                        <option>Tutte le fasce</option>
+                        <option>€1-€10</option>
+                        <option>€11-€25</option>
+                        <option>€26-€50</option>
+                        <option>€50+</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Player Search Results Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-border">
+                            <th class="text-left py-3 px-4 font-semibold text-foreground">Giocatore</th>
+                            <th class="text-left py-3 px-4 font-semibold text-foreground">Ruolo</th>
+                            <th class="text-left py-3 px-4 font-semibold text-foreground">Squadra</th>
+                            <th class="text-right py-3 px-4 font-semibold text-foreground">Quotazione</th>
+                            <th class="text-right py-3 px-4 font-semibold text-foreground">Media Voto</th>
+                            <th class="text-center py-3 px-4 font-semibold text-foreground">Azione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- @MAP: searchResults.map(player => ( -->
+                        <tr class="border-b border-border hover:bg-muted/30 transition-colors" data-mock="true">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A player in action during an official match -->
+                                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="Player" class="w-10 h-10 rounded-full object-cover" />
+                                    <span class="font-medium text-foreground" data-bind="player.name">Zaccagni</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.position">C</td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.team">Lazio</td>
+                            <td class="py-3 px-4 text-right font-bold text-primary" data-bind="player.price">€22</td>
+                            <td class="py-3 px-4 text-right text-foreground" data-bind="player.rating">6.9</td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleBuyPlayer">
+                                    Acquista
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-border hover:bg-muted/30 transition-colors" data-mock="true">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A player in action during an official match -->
+                                    <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="Player" class="w-10 h-10 rounded-full object-cover" />
+                                    <span class="font-medium text-foreground" data-bind="player.name">Immobile</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.position">A</td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.team">Lazio</td>
+                            <td class="py-3 px-4 text-right font-bold text-primary" data-bind="player.price">€35</td>
+                            <td class="py-3 px-4 text-right text-foreground" data-bind="player.rating">7.2</td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleBuyPlayer">
+                                    Acquista
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-border hover:bg-muted/30 transition-colors" data-mock="true">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A player in action during an official match -->
+                                    <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="Player" class="w-10 h-10 rounded-full object-cover" />
+                                    <span class="font-medium text-foreground" data-bind="player.name">Chiesa</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.position">A</td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.team">Juventus</td>
+                            <td class="py-3 px-4 text-right font-bold text-primary" data-bind="player.price">€42</td>
+                            <td class="py-3 px-4 text-right text-foreground" data-bind="player.rating">7.4</td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleBuyPlayer">
+                                    Acquista
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-border hover:bg-muted/30 transition-colors" data-mock="true">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A player in action during an official match -->
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=40&h=40" alt="Player" class="w-10 h-10 rounded-full object-cover" />
+                                    <span class="font-medium text-foreground" data-bind="player.name">Calabria</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.position">D</td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.team">Milan</td>
+                            <td class="py-3 px-4 text-right font-bold text-primary" data-bind="player.price">€18</td>
+                            <td class="py-3 px-4 text-right text-foreground" data-bind="player.rating">6.6</td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleBuyPlayer">
+                                    Acquista
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr class="border-b border-border hover:bg-muted/30 transition-colors" data-mock="true">
+                            <td class="py-3 px-4">
+                                <div class="flex items-center space-x-3">
+                                    <!-- A Serie A player in action during an official match -->
+                                    <img src="https://pixabay.com/get/ge4d0fa9629c491d344a790face765927b0d8c56685d9b59917c36c58fdef40137a083e50c10e65a0f04a4019d05dd3a0073cebf2b56e51b7404e6d3e9f373670_1280.jpg" alt="Player" class="w-10 h-10 rounded-full object-cover" />
+                                    <span class="font-medium text-foreground" data-bind="player.name">Meret</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.position">P</td>
+                            <td class="py-3 px-4 text-muted-foreground" data-bind="player.team">Napoli</td>
+                            <td class="py-3 px-4 text-right font-bold text-primary" data-bind="player.price">€12</td>
+                            <td class="py-3 px-4 text-right text-foreground" data-bind="player.rating">6.7</td>
+                            <td class="py-3 px-4 text-center">
+                                <button class="bg-primary text-primary-foreground px-3 py-1 rounded text-sm font-medium hover:bg-primary/90 transition-colors" data-event="click:handleBuyPlayer">
+                                    Acquista
+                                </button>
+                            </td>
+                        </tr>
+                        <!-- @END_MAP )) -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-between mt-6">
+                <div class="text-sm text-muted-foreground">
+                    Mostrando <span class="font-medium">1-5</span> di <span class="font-medium">342</span> giocatori
+                </div>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted transition-colors" disabled>Precedente</button>
+                    <button class="px-3 py-1 text-sm bg-primary text-primary-foreground rounded-md">1</button>
+                    <button class="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted transition-colors">2</button>
+                    <button class="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted transition-colors">3</button>
+                    <button class="px-3 py-1 text-sm border border-input rounded-md hover:bg-muted transition-colors">Successivo</button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: PlayerSearch -->
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border">
+        <div class="grid grid-cols-4 text-center">
+            <a href="#" class="flex flex-col items-center py-3 text-primary">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                </svg>
+                <span class="text-xs font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 text-muted-foreground">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                </svg>
+                <span class="text-xs font-medium">Rosa</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 text-muted-foreground">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span class="text-xs font-medium">Mercato</span>
+            </a>
+            <a href="#" class="flex flex-col items-center py-3 text-muted-foreground">
+                <svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span class="text-xs font-medium">Stats</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- @STATE: Various state requirements for the application -->
+    <!-- @STATE: user:object = {name, email, credits, teamId} -->
+    <!-- @STATE: team:object = {players, totalCredits, spentCredits, remainingCredits} -->
+    <!-- @STATE: searchFilters:object = {position, priceRange, searchTerm} -->
+    <!-- @STATE: recommendations:array = [] -->
+    <!-- @STATE: marketActivity:array = [] -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        // TODO: Player search and filtering functionality
+        // TODO: Team roster management
+        // TODO: Credit calculation and validation
+        // TODO: Real-time market updates
+        // TODO: Player recommendation algorithm
+        // TODO: Authentication and user session management
+        
+        (function() {
+            // Simple demo interactions for the mockup
+            console.log('Fantacalcio Serie A Dashboard initialized');
+            
+            // Mock data for demonstration
+            const mockData = {
+                user: {
+                    name: 'Marco Rossi',
+                    credits: 250,
+                    email: 'marco.rossi@email.com'
+                },
+                team: {
+                    playerCount: 18,
+                    remainingCredits: 250,
+                    spentCredits: 250,
+                    averageRating: 6.8,
+                    totalScore: 127.5
+                }
+            };
+            
+            // Initialize dashboard data
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Dashboard data loaded:', mockData);
+            });
+        })();
+    </script>
+</body>
+</html>
