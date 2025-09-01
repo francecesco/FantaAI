@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,30 +16,30 @@ import { TeamPerformanceChart } from "@/components/team-performance-chart";
 import type { TeamStats, UserTeam, Player, Transaction } from "@shared/schema";
 
 export default function Stats() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!user) {
-      setLocation("/login");
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/api/login";
     }
-  }, [user, setLocation]);
+  }, [isAuthenticated, isLoading]);
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: userTeam = [] } = useQuery<(UserTeam & { player: Player })[]>({
     queryKey: ["/api/team", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: transactions = [] } = useQuery<Transaction[]>({
     queryKey: ["/api/transactions", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const refreshPlayersMutation = useMutation({
@@ -64,7 +64,7 @@ export default function Stats() {
     },
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 

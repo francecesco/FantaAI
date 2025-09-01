@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,29 +23,29 @@ interface SimulationResult {
 }
 
 export default function Simulation() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
   const [isSimulating, setIsSimulating] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setLocation("/login");
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/api/login";
     }
-  }, [user, setLocation]);
+  }, [isAuthenticated, isLoading]);
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: userTeam = [] } = useQuery<(UserTeam & { player: Player })[]>({
     queryKey: ["/api/team", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 
@@ -262,7 +262,7 @@ export default function Simulation() {
                       {simulationResult.userScore} - {simulationResult.opponentScore}
                     </div>
                     <div className="text-lg">
-                      <span className="font-semibold">{user.username}</span>
+                      <span className="font-semibold">{user.firstName || user.email}</span>
                       <span className="text-muted-foreground mx-2">vs</span>
                       <span className="font-semibold">{simulationResult.opponentTeam}</span>
                     </div>

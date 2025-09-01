@@ -1,44 +1,26 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertUserTeamSchema, insertTransactionSchema } from "@shared/schema";
-import { z } from "zod";
+import { setupAuth, isAuthenticated } from "./replitAuth";
+import { insertUserTeamSchema, insertTransactionSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Authentication routes
-  app.post("/api/auth/register", async (req, res) => {
-    try {
-      const userData = insertUserSchema.parse(req.body);
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(userData.email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
-      }
+  // Auth middleware
+  await setupAuth(app);
 
-      const user = await storage.createUser(userData);
-      res.json({ user: { id: user.id, username: user.username, email: user.email, totalCredits: user.totalCredits } });
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
     } catch (error) {
-      res.status(400).json({ message: "Invalid user data" });
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      const user = await storage.getUserByUsername(username);
-      if (!user || user.password !== password) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      res.json({ user: { id: user.id, username: user.username, email: user.email, totalCredits: user.totalCredits } });
-    } catch (error) {
-      res.status(400).json({ message: "Login failed" });
-    }
-  });
-
-  // Player routes
+  // Players routes
   app.get("/api/players", async (req, res) => {
     try {
       const { search, position, minPrice, maxPrice } = req.query;
@@ -54,7 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         players = await storage.getAllPlayers();
       }
-
+      
       res.json(players);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch players" });
@@ -73,38 +55,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/players/position/:position", async (req, res) => {
-    try {
-      const players = await storage.getPlayersByPosition(req.params.position);
-      res.json(players);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch players by position" });
-    }
-  });
-
-  // Team routes
-  app.get("/api/team/:userId", async (req, res) => {
+  // Team routes - protected
+  app.get("/api/team/:userId", isAuthenticated, async (req, res) => {
     try {
       const userTeam = await storage.getUserTeam(req.params.userId);
       
-      // Get full player details
-      const playersWithDetails = await Promise.all(
-        userTeam.map(async (ut) => {
-          const player = await storage.getPlayerById(ut.playerId);
-          return {
-            ...ut,
-            player
-          };
-        })
-      );
-
-      res.json(playersWithDetails);
+      // Populate with player data
+      const teamWithPlayers = [];
+      for (const ut of userTeam) {
+        const player = await storage.getPlayerById(ut.playerId);
+        if (player) {
+          teamWithPlayers.push({ ...ut, player });
+        }
+      }
+      
+      res.json(teamWithPlayers);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch team" });
     }
   });
 
-  app.get("/api/team/:userId/stats", async (req, res) => {
+  app.get("/api/team/:userId/stats", isAuthenticated, async (req, res) => {
     try {
       const stats = await storage.getUserTeamStats(req.params.userId);
       res.json(stats);
@@ -113,72 +84,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/team/add-player", async (req, res) => {
+  app.post("/api/team/:userId/players", isAuthenticated, async (req, res) => {
     try {
-      const { userId, playerId, purchasePrice } = req.body;
+      const result = insertUserTeamSchema.safeParse({
+        userId: req.params.userId,
+        ...req.body,
+      });
       
-      // Validate input
-      const userTeamData = insertUserTeamSchema.parse({
-        userId,
-        playerId,
-        purchasePrice
+      if (!result.success) {
+        return res.status(400).json({ message: "Invalid request data" });
+      }
+
+      const userTeam = await storage.addPlayerToTeam(result.data);
+      
+      // Create buy transaction
+      await storage.createTransaction({
+        userId: req.params.userId,
+        playerId: result.data.playerId,
+        type: "BUY",
+        amount: result.data.purchasePrice,
       });
 
-      // Check if user has enough credits
-      const stats = await storage.getUserTeamStats(userId);
-      if (stats.remainingCredits < purchasePrice) {
-        return res.status(400).json({ message: "Insufficient credits" });
+      // Update user credits
+      const user = await storage.getUser(req.params.userId);
+      if (user) {
+        await storage.updateUserCredits(req.params.userId, user.totalCredits - result.data.purchasePrice);
       }
 
-      // Check if player is already in team
-      const userTeam = await storage.getUserTeam(userId);
-      const alreadyOwned = userTeam.some(ut => ut.playerId === playerId);
-      if (alreadyOwned) {
-        return res.status(400).json({ message: "Player already in team" });
-      }
+      res.json(userTeam);
+    } catch (error) {
+      console.error("Error adding player to team:", error);
+      res.status(500).json({ message: "Failed to add player to team" });
+    }
+  });
 
-      // Add player to team
-      const teamEntry = await storage.addPlayerToTeam(userTeamData);
+  app.delete("/api/team/:userId/players/:playerId", isAuthenticated, async (req, res) => {
+    try {
+      const { userId, playerId } = req.params;
       
-      // Create transaction record
+      // Get player details for pricing
+      const player = await storage.getPlayerById(playerId);
+      if (!player) {
+        return res.status(404).json({ message: "Player not found" });
+      }
+
+      // Calculate sale price (80% of current market value)
+      const salePrice = Math.floor(player.price * 0.8);
+
+      await storage.removePlayerFromTeam(userId, playerId);
+      
+      // Create sell transaction
       await storage.createTransaction({
         userId,
         playerId,
-        type: "BUY",
-        amount: purchasePrice
+        type: "SELL",
+        amount: salePrice,
       });
 
-      res.json(teamEntry);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to add player to team" });
-    }
-  });
-
-  app.delete("/api/team/remove-player", async (req, res) => {
-    try {
-      const { userId, playerId } = req.body;
-      
-      await storage.removePlayerFromTeam(userId, playerId);
-      
-      // Create transaction record
-      const player = await storage.getPlayerById(playerId);
-      if (player) {
-        await storage.createTransaction({
-          userId,
-          playerId,
-          type: "SELL",
-          amount: Math.floor(player.price * 0.8) // Sell for 80% of market value
-        });
+      // Update user credits
+      const user = await storage.getUser(userId);
+      if (user) {
+        await storage.updateUserCredits(userId, user.totalCredits + salePrice);
       }
 
-      res.json({ success: true });
+      res.json({ salePrice });
     } catch (error) {
-      res.status(400).json({ message: "Failed to remove player from team" });
+      console.error("Error removing player from team:", error);
+      res.status(500).json({ message: "Failed to remove player from team" });
     }
   });
 
-  // Recommendations route
-  app.get("/api/recommendations/:userId", async (req, res) => {
+  // Recommendations route - protected
+  app.get("/api/recommendations/:userId", isAuthenticated, async (req, res) => {
     try {
       const recommendations = await storage.getPlayerRecommendations(req.params.userId);
       res.json(recommendations);
@@ -197,8 +174,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Transactions route
-  app.get("/api/transactions/:userId", async (req, res) => {
+  // Transactions route - protected
+  app.get("/api/transactions/:userId", isAuthenticated, async (req, res) => {
     try {
       const transactions = await storage.getUserTransactions(req.params.userId);
       res.json(transactions);
@@ -207,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin route to refresh player data from API
+  // Admin route to refresh player data
   app.post("/api/admin/refresh-players", async (req, res) => {
     try {
       await storage.refreshPlayersFromAPI();

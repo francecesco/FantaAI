@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { PlayerCard } from "@/components/player-card";
@@ -14,29 +14,26 @@ import { apiRequest } from "@/lib/queryClient";
 import type { UserTeam, Player } from "@shared/schema";
 
 export default function Roster() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedPosition, setSelectedPosition] = useState("all");
 
   useEffect(() => {
-    if (!user) {
-      setLocation("/login");
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/api/login";
     }
-  }, [user, setLocation]);
+  }, [isAuthenticated, isLoading]);
 
-  const { data: userTeam = [], isLoading } = useQuery<(UserTeam & { player: Player })[]>({
+  const { data: userTeam = [], isLoading: isLoadingTeam } = useQuery<(UserTeam & { player: Player })[]>({
     queryKey: ["/api/team", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const removePlayerMutation = useMutation({
     mutationFn: async (playerId: string) => {
-      const response = await apiRequest("DELETE", "/api/team/remove-player", {
-        userId: user?.id,
-        playerId,
-      });
+      const response = await apiRequest("DELETE", `/api/team/${user?.id}/players/${playerId}`, {});
       return response.json();
     },
     onSuccess: () => {
@@ -56,7 +53,7 @@ export default function Roster() {
     },
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 
@@ -144,7 +141,7 @@ export default function Roster() {
                 </CardHeader>
 
                 <CardContent>
-                  {isLoading ? (
+                  {isLoadingTeam ? (
                     <div className="text-center py-8" data-testid="loading-roster">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                       <p className="text-muted-foreground mt-2">Caricamento rosa...</p>

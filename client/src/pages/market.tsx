@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { Header } from "@/components/layout/header";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { PlayerSearch } from "@/components/player-search";
@@ -11,31 +11,30 @@ import { apiRequest } from "@/lib/queryClient";
 import type { Player, UserTeam, TeamStats } from "@shared/schema";
 
 export default function Market() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!user) {
-      setLocation("/login");
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = "/api/login";
     }
-  }, [user, setLocation]);
+  }, [isAuthenticated, isLoading]);
 
   const { data: userTeam = [] } = useQuery<(UserTeam & { player: Player })[]>({
     queryKey: ["/api/team", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const addPlayerMutation = useMutation({
     mutationFn: async (player: Player) => {
-      const response = await apiRequest("POST", "/api/team/add-player", {
-        userId: user?.id,
+      const response = await apiRequest("POST", `/api/team/${user?.id}/players`, {
         playerId: player.id,
         purchasePrice: player.price,
       });
@@ -58,7 +57,7 @@ export default function Market() {
     },
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 
@@ -104,7 +103,7 @@ export default function Market() {
               <div className="bg-muted px-4 py-2 rounded-lg">
                 <span className="text-sm text-muted-foreground">Crediti disponibili: </span>
                 <span className="text-lg font-semibold text-primary" data-testid="text-available-credits">
-                  €{teamStats?.remainingCredits || user.totalCredits}
+                  €{teamStats?.remainingCredits || 500}
                 </span>
               </div>
             </div>

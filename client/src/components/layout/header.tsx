@@ -1,4 +1,4 @@
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,15 +6,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { TeamStats } from "@shared/schema";
 
 export function Header() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [location] = useLocation();
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 
@@ -63,24 +63,24 @@ export function Header() {
             <div className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="text-sm">
-                  {user.username.slice(0, 2).toUpperCase()}
+                  {(user.firstName || user.email)?.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm font-medium text-foreground hidden sm:block" data-testid="text-username">
-                {user.username}
+                {user.firstName || user.email}
               </span>
             </div>
             
             <div className="bg-muted px-3 py-1 rounded-full">
               <span className="text-sm font-semibold text-primary" data-testid="text-credits">
-                €{teamStats?.remainingCredits || user.totalCredits}
+                €{teamStats?.remainingCredits || 500}
               </span>
             </div>
 
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={logout}
+              onClick={() => window.location.href = "/api/logout"}
               data-testid="button-logout"
             >
               Esci
