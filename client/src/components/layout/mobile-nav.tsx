@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { BarChart3, Home, Search, Users, Play } from "lucide-react";
+import { BarChart3, Home, Search, Users, Calendar } from "lucide-react";
 
 export function MobileNav() {
   const [location] = useLocation();
@@ -9,7 +9,7 @@ export function MobileNav() {
     { name: "Rosa", href: "/roster", icon: Users, active: location === "/roster" },
     { name: "Mercato", href: "/market", icon: Search, active: location === "/market" },
     { name: "Stats", href: "/stats", icon: BarChart3, active: location === "/stats" },
-    { name: "Simula", href: "/simulation", icon: Play, active: location === "/simulation" },
+    { name: "Calendario", href: "/calendar", icon: Calendar, active: location === "/calendar" },
   ];
 
   return (

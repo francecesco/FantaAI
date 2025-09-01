@@ -60,6 +60,18 @@ export const transactions = pgTable("transactions", {
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
 
+export const matches = pgTable("matches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  round: integer("round").notNull(), // Giornata
+  homeTeam: text("home_team").notNull(),
+  awayTeam: text("away_team").notNull(),
+  homeScore: integer("home_score"), // null se non giocata
+  awayScore: integer("away_score"), // null se non giocata
+  date: timestamp("date").notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("scheduled"), // scheduled, live, finished, postponed
+  fantacalcioId: varchar("fantacalcio_id").unique(), // ID dalla fonte esterna
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -86,6 +98,10 @@ export const insertTransactionSchema = createInsertSchema(transactions).omit({
   createdAt: true,
 });
 
+export const insertMatchSchema = createInsertSchema(matches).omit({
+  id: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -96,6 +112,8 @@ export type UserTeam = typeof userTeams.$inferSelect;
 export type InsertUserTeam = z.infer<typeof insertUserTeamSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type Match = typeof matches.$inferSelect;
+export type InsertMatch = z.infer<typeof insertMatchSchema>;
 
 // Additional types for API responses
 export type TeamStats = {

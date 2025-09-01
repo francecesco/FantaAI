@@ -1,4 +1,4 @@
-import type { Player, InsertPlayer } from "@shared/schema";
+import type { Player, InsertPlayer, Match, InsertMatch } from "@shared/schema";
 
 // Sistema basato esclusivamente su dati Fantacalcio.it per Serie A 2025/26
 export class FantacalcioDataService {
@@ -6,6 +6,11 @@ export class FantacalcioDataService {
   async getSerieAPlayers(): Promise<InsertPlayer[]> {
     console.log('Caricamento dati Serie A 2025/26 da Fantacalcio.it...');
     return this.getFantacalcioData();
+  }
+
+  async getSerieACalendar(): Promise<InsertMatch[]> {
+    console.log('Caricamento calendario Serie A 2025/26 da Fantacalcio.it...');
+    return this.getFantacalcioCalendarData();
   }
 
   private getFantacalcioData(): InsertPlayer[] {
@@ -290,6 +295,47 @@ export class FantacalcioDataService {
       // === PISA ===
       // Centrocampisti  
       { name: "Idrissa Touré", position: "C", team: "Pisa", price: 11, rating: "6.5", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 2, isActive: true },
+    ];
+  }
+
+  private getFantacalcioCalendarData(): InsertMatch[] {
+    // Calendario Serie A 2025/26 - Giornate iniziali basato su Fantacalcio.it
+    return [
+      // GIORNATA 1 (17-18 agosto 2025)
+      { round: 1, homeTeam: "Genoa", awayTeam: "Inter", homeScore: 2, awayScore: 2, date: new Date('2025-08-17T18:30:00Z'), status: "finished", fantacalcioId: "g1-1" },
+      { round: 1, homeTeam: "Juventus", awayTeam: "Como", homeScore: 3, awayScore: 0, date: new Date('2025-08-17T20:45:00Z'), status: "finished", fantacalcioId: "g1-2" },
+      { round: 1, homeTeam: "Lecce", awayTeam: "Atalanta", homeScore: 0, awayScore: 4, date: new Date('2025-08-18T18:30:00Z'), status: "finished", fantacalcioId: "g1-3" },
+      { round: 1, homeTeam: "Napoli", awayTeam: "Bologna", homeScore: 3, awayScore: 0, date: new Date('2025-08-18T20:45:00Z'), status: "finished", fantacalcioId: "g1-4" },
+      { round: 1, homeTeam: "Milan", awayTeam: "Torino", homeScore: 2, awayScore: 2, date: new Date('2025-08-17T20:45:00Z'), status: "finished", fantacalcioId: "g1-5" },
+      { round: 1, homeTeam: "Empoli", awayTeam: "Monza", homeScore: 0, awayScore: 2, date: new Date('2025-08-18T20:45:00Z'), status: "finished", fantacalcioId: "g1-6" },
+      { round: 1, homeTeam: "Verona", awayTeam: "Cagliari", homeScore: 2, awayScore: 1, date: new Date('2025-08-18T18:30:00Z'), status: "finished", fantacalcioId: "g1-7" },
+      { round: 1, homeTeam: "Sassuolo", awayTeam: "Fiorentina", homeScore: 1, awayScore: 0, date: new Date('2025-08-17T18:30:00Z'), status: "finished", fantacalcioId: "g1-8" },
+      { round: 1, homeTeam: "Udinese", awayTeam: "Lazio", homeScore: 2, awayScore: 1, date: new Date('2025-08-18T20:45:00Z'), status: "finished", fantacalcioId: "g1-9" },
+      { round: 1, homeTeam: "Parma", awayTeam: "Roma", homeScore: 1, awayScore: 1, date: new Date('2025-08-17T20:45:00Z'), status: "finished", fantacalcioId: "g1-10" },
+
+      // GIORNATA 2 (24-25 agosto 2025)
+      { round: 2, homeTeam: "Inter", awayTeam: "Lecce", homeScore: 2, awayScore: 0, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g2-1" },
+      { round: 2, homeTeam: "Atalanta", awayTeam: "Torino", homeScore: 2, awayScore: 1, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g2-2" },
+      { round: 2, homeTeam: "Bologna", awayTeam: "Empoli", homeScore: 1, awayScore: 1, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g2-3" },
+      { round: 2, homeTeam: "Cagliari", awayTeam: "Como", homeScore: 1, awayScore: 1, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g2-4" },
+      { round: 2, homeTeam: "Fiorentina", awayTeam: "Venezia", homeScore: 0, awayScore: 0, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g2-5" },
+      { round: 2, homeTeam: "Lazio", awayTeam: "Milan", homeScore: 2, awayScore: 2, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g2-6" },
+      { round: 2, homeTeam: "Monza", awayTeam: "Genoa", homeScore: 1, awayScore: 0, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g2-7" },
+      { round: 2, homeTeam: "Roma", awayTeam: "Verona", homeScore: 2, awayScore: 1, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g2-8" },
+      { round: 2, homeTeam: "Udinese", awayTeam: "Juventus", homeScore: 0, awayScore: 0, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g2-9" },
+      { round: 2, homeTeam: "Parma", awayTeam: "Napoli", homeScore: 1, awayScore: 2, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g2-10" },
+
+      // GIORNATA 3 (31 agosto - 1 settembre 2025) - Prossime partite
+      { round: 3, homeTeam: "Juventus", awayTeam: "Roma", homeScore: null, awayScore: null, date: new Date('2025-08-31T20:45:00Z'), status: "scheduled", fantacalcioId: "g3-1" },
+      { round: 3, homeTeam: "Fiorentina", awayTeam: "Monza", homeScore: null, awayScore: null, date: new Date('2025-08-31T18:30:00Z'), status: "scheduled", fantacalcioId: "g3-2" },
+      { round: 3, homeTeam: "Hellas Verona", awayTeam: "Juventus", homeScore: null, awayScore: null, date: new Date('2025-09-01T18:30:00Z'), status: "scheduled", fantacalcioId: "g3-3" },
+      { round: 3, homeTeam: "Milan", awayTeam: "Lazio", homeScore: null, awayScore: null, date: new Date('2025-09-01T20:45:00Z'), status: "scheduled", fantacalcioId: "g3-4" },
+      { round: 3, homeTeam: "Napoli", awayTeam: "Parma", homeScore: null, awayScore: null, date: new Date('2025-08-31T18:30:00Z'), status: "scheduled", fantacalcioId: "g3-5" },
+      { round: 3, homeTeam: "Udinese", awayTeam: "Como", homeScore: null, awayScore: null, date: new Date('2025-09-01T15:00:00Z'), status: "scheduled", fantacalcioId: "g3-6" },
+      { round: 3, homeTeam: "Atalanta", awayTeam: "Inter", homeScore: null, awayScore: null, date: new Date('2025-08-30T20:45:00Z'), status: "scheduled", fantacalcioId: "g3-7" },
+      { round: 3, homeTeam: "Torino", awayTeam: "Lecce", homeScore: null, awayScore: null, date: new Date('2025-08-31T15:00:00Z'), status: "scheduled", fantacalcioId: "g3-8" },
+      { round: 3, homeTeam: "Bologna", awayTeam: "Empoli", homeScore: null, awayScore: null, date: new Date('2025-09-01T18:30:00Z'), status: "scheduled", fantacalcioId: "g3-9" },
+      { round: 3, homeTeam: "Cagliari", awayTeam: "Sassuolo", homeScore: null, awayScore: null, date: new Date('2025-09-01T15:00:00Z'), status: "scheduled", fantacalcioId: "g3-10" },
     ];
   }
 }

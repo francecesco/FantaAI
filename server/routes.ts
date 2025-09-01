@@ -185,6 +185,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Calendar route - public (calendario Serie A)
+  app.get("/api/calendar", async (req, res) => {
+    try {
+      const matches = await storage.getSerieACalendar();
+      res.json(matches);
+    } catch (error) {
+      console.error("Error fetching calendar:", error);
+      res.status(500).json({ message: "Failed to fetch calendar" });
+    }
+  });
+
   // Admin route to refresh player data
   app.post("/api/admin/refresh-players", async (req, res) => {
     try {
@@ -203,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Player data refreshed successfully" });
     } catch (error) {
       console.error("Error refreshing player data:", error);
-      res.status(500).json({ message: "Failed to refresh player data", error: error.message });
+      res.status(500).json({ message: "Failed to refresh player data", error: error instanceof Error ? error.message : 'Unknown error' });
     }
   });
 

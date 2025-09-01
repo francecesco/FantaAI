@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Users, TrendingUp, Target, BarChart3 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { TeamStats, UserTeam, Player, PlayerRecommendation, MarketActivity } from "@shared/schema";
+import type { TeamStats, UserTeam, Player, PlayerRecommendation } from "@shared/schema";
 
 export default function Dashboard() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -40,9 +40,6 @@ export default function Dashboard() {
     enabled: !!user?.id,
   });
 
-  const { data: marketActivity = [] } = useQuery<MarketActivity[]>({
-    queryKey: ["/api/market/activity"],
-  });
 
   const addPlayerMutation = useMutation({
     mutationFn: async ({ playerId, price }: { playerId: string; price: number }) => {
@@ -399,48 +396,6 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Market Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Mercato Live</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {marketActivity.slice(0, 3).map((activity) => (
-                    <div 
-                      key={activity.id} 
-                      className="flex items-center justify-between py-2 border-b border-border last:border-b-0"
-                      data-testid={`market-activity-${activity.id}`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-chart-2 rounded-full"></div>
-                        <div>
-                          <span className="text-sm font-medium text-foreground">
-                            {activity.playerName}
-                          </span>
-                          <div className="text-xs text-muted-foreground">
-                            {activity.fromTeam} → {activity.toTeam}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-accent">
-                          {(activity.price / 1000000).toFixed(0)}FM
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {Math.floor((Date.now() - new Date(activity.timestamp).getTime()) / 60000)} min fa
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {marketActivity.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4" data-testid="no-market-activity">
-                      Nessuna attività di mercato
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </main>

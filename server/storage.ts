@@ -3,6 +3,7 @@ import {
   players,
   userTeams,
   transactions,
+  matches,
   type User,
   type UpsertUser,
   type Player,
@@ -11,6 +12,8 @@ import {
   type InsertUserTeam,
   type Transaction,
   type InsertTransaction,
+  type Match,
+  type InsertMatch,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, sql, desc, asc } from "drizzle-orm";
@@ -59,6 +62,9 @@ export interface IStorage {
   getFormations(userId: string): Promise<Formation[]>;
   saveFormation(userId: string, formation: Omit<Formation, 'id' | 'userId' | 'createdAt'>): Promise<Formation>;
   getLeagueStandings(): Promise<LeagueStanding[]>;
+
+  // Calendar operations
+  getSerieACalendar(): Promise<Match[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -579,6 +585,26 @@ export class DatabaseStorage implements IStorage {
         losses: 1,
       },
     ];
+  }
+
+  async getSerieACalendar(): Promise<Match[]> {
+    try {
+      // Check if matches already exist in database
+      const existingMatches = await db.select().from(matches).limit(1);
+      if (existingMatches.length === 0) {
+        // Initialize matches from API data
+        const calendarData = await footballDataService.getSerieACalendar();
+        if (calendarData.length > 0) {
+          await db.insert(matches).values(calendarData);
+        }
+      }
+
+      // Return all matches ordered by round and date
+      return await db.select().from(matches).orderBy(asc(matches.round), asc(matches.date));
+    } catch (error) {
+      console.error("Error fetching calendar:", error);
+      return [];
+    }
   }
 }
 
