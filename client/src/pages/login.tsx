@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { invalidateUser } = useAuth();
 
   const handleGoogleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,16 +26,23 @@ export default function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
+        credentials: "include", // Importante per i cookie di sessione
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        // Invalida la cache dell'utente per forzare il reload
+        invalidateUser();
+        
         toast({
           title: "Login effettuato!",
           description: "Benvenuto in FantaSerieA!",
         });
-        setLocation("/dashboard");
+        
+        // Reindirizza alla dashboard o alla pagina specificata dal server
+        const redirectTo = data.redirectTo || "/dashboard";
+        setLocation(redirectTo);
       } else {
         toast({
           title: "Errore",
@@ -42,6 +51,7 @@ export default function Login() {
         });
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         title: "Errore",
         description: "Errore di connessione",

@@ -1,13 +1,16 @@
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import type { TeamStats } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, invalidateUser } = useAuth();
   const [location] = useLocation();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
@@ -17,6 +20,42 @@ export function Header() {
   if (!user?.id) {
     return null;
   }
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        // Invalida tutte le query per forzare il reload
+        queryClient.clear();
+        invalidateUser();
+        
+        toast({
+          title: "Logout effettuato",
+          description: "Arrivederci!",
+        });
+        
+        // Reindirizza alla landing page
+        window.location.href = "/";
+      } else {
+        toast({
+          title: "Errore",
+          description: "Errore durante il logout",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Errore",
+        description: "Errore di connessione durante il logout",
+        variant: "destructive",
+      });
+    }
+  };
 
   const navigation = [
     { name: "Dashboard", href: "/", active: location === "/" },
@@ -80,7 +119,7 @@ export function Header() {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => window.location.href = "/api/logout"}
+              onClick={handleLogout}
               data-testid="button-logout"
             >
               Esci

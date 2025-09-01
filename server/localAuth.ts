@@ -6,7 +6,8 @@ import { storage } from "./storage";
 const pgSession = connectPg(session);
 
 export function getSession() {
-  const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
+  // Sessioni persistenti - non scadono mai (o dopo 1 anno)
+  const sessionTtl = 365 * 24 * 60 * 60 * 1000; // 1 anno
   const sessionStore = new pgSession({
     conString: process.env.DATABASE_URL,
     createTableIfMissing: true,
@@ -17,12 +18,13 @@ export function getSession() {
   return session({
     secret: process.env.SESSION_SECRET!,
     store: sessionStore,
-    resave: false,
+    resave: true, // Salva sempre per mantenere la sessione attiva
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      maxAge: sessionTtl,
+      maxAge: sessionTtl, // Cookie che non scade mai (o dopo 1 anno)
+      sameSite: 'lax',
     },
   });
 }
@@ -82,10 +84,19 @@ export function setupAuth(app: any) {
         profileImageUrl: user.profileImageUrl,
       };
 
-      res.json({ 
-        success: true, 
-        user: req.session.user,
-        message: "Login effettuato con successo con Google!" 
+      // Forza il salvataggio della sessione
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).json({ message: "Errore nel salvataggio della sessione" });
+        }
+
+        res.json({ 
+          success: true, 
+          user: req.session.user,
+          message: "Login effettuato con successo con Google!",
+          redirectTo: "/dashboard" // Indica dove reindirizzare
+        });
       });
     } catch (error) {
       console.error("Login error:", error);
@@ -99,7 +110,11 @@ export function setupAuth(app: any) {
       if (err) {
         return res.status(500).json({ message: "Errore durante il logout" });
       }
-      res.json({ success: true, message: "Logout effettuato con successo" });
+      res.json({ 
+        success: true, 
+        message: "Logout effettuato con successo",
+        redirectTo: "/" // Reindirizza alla landing page
+      });
     });
   });
 

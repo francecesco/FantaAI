@@ -1,0 +1,31 @@
+{
+  "sources": [
+    {
+      "name": "Fantacalcio.it",
+      "url": "https://www.fantacalcio.it/serie-a",
+      "type": "official",
+      "priority": 1
+    },
+    {
+      "name": "Transfermarkt.it",
+      "url": "https://www.transfermarkt.it/serie-a/startseite/wettbewerb/IT1",
+      "type": "transfer",
+      "priority": 2
+    },
+    {
+      "name": "Gazzetta.it",
+      "url": "https://www.gazzetta.it/Calcio/Serie-A",
+      "type": "news",
+      "priority": 3
+    },
+    {
+      "name": "Sky Sport",
+      "url": "https://sport.sky.it/calcio/serie-a",
+      "type": "news",
+      "priority": 3
+    }
+  ],
+  "update_frequency": "weekly",
+  "last_update": "$(date +%Y-%m-%d)",
+  "next_update": "$(date -v+7d +%Y-%m-%d)"
+}
