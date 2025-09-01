@@ -81,10 +81,10 @@ export function PlayerSearch({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tutte le fasce</SelectItem>
-              <SelectItem value="1-10">€1-€10</SelectItem>
-              <SelectItem value="11-25">€11-€25</SelectItem>
-              <SelectItem value="26-50">€26-€50</SelectItem>
-              <SelectItem value="50+">€50+</SelectItem>
+              <SelectItem value="1-10">1-10FM</SelectItem>
+              <SelectItem value="11-25">11-25FM</SelectItem>
+              <SelectItem value="26-50">26-50FM</SelectItem>
+              <SelectItem value="50+">50+FM</SelectItem>
             </SelectContent>
           </Select>
         </div>

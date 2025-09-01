@@ -175,13 +175,13 @@ export default function Stats() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="text-center p-4 bg-muted rounded-lg">
                           <div className="text-2xl font-bold text-primary">
-                            €{teamStats?.spentCredits || 0}
+                            {teamStats?.spentCredits || 0}FM
                           </div>
                           <div className="text-sm text-muted-foreground">Spesi</div>
                         </div>
                         <div className="text-center p-4 bg-muted rounded-lg">
                           <div className="text-2xl font-bold text-chart-2">
-                            €{teamStats?.remainingCredits || 500}
+                            {teamStats?.remainingCredits || 500}FM
                           </div>
                           <div className="text-sm text-muted-foreground">Disponibili</div>
                         </div>
@@ -201,7 +201,7 @@ export default function Stats() {
 
                       <div className="text-center">
                         <div className="text-lg font-semibold text-foreground">
-                          Media Valore: €{userTeam.length > 0 ? Math.round((teamStats?.spentCredits || 0) / userTeam.length) : 0}
+                          Media Valore: {userTeam.length > 0 ? Math.round((teamStats?.spentCredits || 0) / userTeam.length) : 0}FM
                         </div>
                         <div className="text-sm text-muted-foreground">per giocatore</div>
                       </div>
@@ -362,7 +362,7 @@ export default function Stats() {
                           <div className="flex justify-between items-center">
                             <span className="text-sm font-medium">Costo Medio Giocatore</span>
                             <span className="text-sm text-primary font-bold">
-                              €{userTeam.length > 0 ? Math.round((teamStats?.spentCredits || 0) / userTeam.length) : 0}
+                              {userTeam.length > 0 ? Math.round((teamStats?.spentCredits || 0) / userTeam.length) : 0}FM
                             </span>
                           </div>
                         </div>
@@ -418,7 +418,7 @@ export default function Stats() {
                             </div>
                             <div className="text-right">
                               <div className={`font-bold ${transaction.type === "BUY" ? "text-red-600" : "text-green-600"}`}>
-                                {transaction.type === "BUY" ? "-" : "+"}€{transaction.amount}
+                                {transaction.type === "BUY" ? "-" : "+"}{transaction.amount}FM
                               </div>
                             </div>
                           </div>

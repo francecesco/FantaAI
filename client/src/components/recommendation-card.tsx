@@ -33,7 +33,7 @@ export function RecommendationCard({ recommendation, onAddPlayer }: Recommendati
         </div>
         <div className="text-right">
           <span className="text-lg font-bold text-primary" data-testid={`text-recommendation-price-${player.id}`}>
-            €{player.price}
+            {player.price}FM
           </span>
           <div className="flex items-center text-xs text-chart-2 font-medium">
             <TrendingUp className="w-3 h-3 mr-1" />

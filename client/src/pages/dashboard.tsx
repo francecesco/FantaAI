@@ -79,7 +79,7 @@ export default function Dashboard() {
     if (!teamStats || teamStats.remainingCredits < recommendation.player.price) {
       toast({
         title: "Crediti insufficienti",
-        description: `Ti servono €${recommendation.player.price} ma hai solo €${teamStats?.remainingCredits || 0}`,
+        description: `Ti servono ${recommendation.player.price}FM ma hai solo ${teamStats?.remainingCredits || 0}FM`,
         variant: "destructive",
       });
       return;
@@ -197,7 +197,7 @@ export default function Dashboard() {
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">Crediti Residui</p>
                     <p className="text-2xl font-bold text-foreground" data-testid="text-remaining-credits">
-                      €{teamStats?.remainingCredits || user.totalCredits}
+                      {teamStats?.remainingCredits || user.totalCredits}FM
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-chart-1/10 rounded-full flex items-center justify-center">
@@ -208,7 +208,7 @@ export default function Dashboard() {
                   <div className="flex items-center text-sm">
                     <span className="text-muted-foreground">Spesi: </span>
                     <span className="text-accent font-medium ml-1" data-testid="text-spent-credits">
-                      €{teamStats?.spentCredits || 0}
+                      {teamStats?.spentCredits || 0}FM
                     </span>
                   </div>
                 </div>
@@ -381,7 +381,7 @@ export default function Dashboard() {
                       💰 Gestione Budget
                     </h4>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      Regola d'oro: spendi €200-250M per 2-3 campioni, poi completa con giocatori da €5-15M. 
+                      Regola d'oro: spendi 200-250FM per 2-3 campioni, poi completa con giocatori da 5-15FM. 
                       Non comprare solo stelle costose!
                     </p>
                   </div>
@@ -425,7 +425,7 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-bold text-accent">
-                          €{(activity.price / 1000000).toFixed(0)}M
+                          {(activity.price / 1000000).toFixed(0)}FM
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {Math.floor((Date.now() - new Date(activity.timestamp).getTime()) / 60000)} min fa

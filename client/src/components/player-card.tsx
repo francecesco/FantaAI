@@ -45,7 +45,7 @@ export function PlayerCard({
               {player.name}
             </h5>
             <span className="text-sm font-bold text-primary" data-testid={`text-player-price-${player.id}`}>
-              €{purchasePrice || player.price}
+              {purchasePrice || player.price}FM
             </span>
           </div>
           

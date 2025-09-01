@@ -118,7 +118,7 @@ export default function Landing() {
             Pronto a dominare la Serie A?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Inizia con €500 di budget e costruisci la squadra perfetta
+            Inizia con 500FM di budget e costruisci la squadra perfetta
           </p>
           <Button 
             size="lg" 

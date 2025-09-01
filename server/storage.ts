@@ -415,24 +415,24 @@ export class DatabaseStorage implements IStorage {
       P: "🥅 I portieri guadagnano punti con parate e rigori parati. Cerca chi gioca sempre!",
       D: "🛡️ I difensori prendono bonus con porta inviolata e gol. Scegli titolari delle big!", 
       C: "⚡ I centrocampisti sono jolly: assist, gol e gioco. I più affidabili per punti!",
-      A: "🚀 Gli attaccanti vivono di gol. Meglio 1 bomber da €40M che 2 da €20M!"
+      A: "🚀 Gli attaccanti vivono di gol. Meglio 1 bomber da 40FM che 2 da 20FM!"
     };
     
     // Consigli specifici per principianti
     if (userTeam.length === 0) {
-      return `🎯 PRIMO ACQUISTO: Inizia con ${player.name} (${positionNames[player.position as keyof typeof positionNames]})! Voto ${rating}, costa €${player.price}M. ${positionTips[player.position as keyof typeof positionTips]}`;
+      return `🎯 PRIMO ACQUISTO: Inizia con ${player.name} (${positionNames[player.position as keyof typeof positionNames]})! Voto ${rating}, costa ${player.price}FM. ${positionTips[player.position as keyof typeof positionTips]}`;
     }
     
     if (rating >= 7.5 && player.price <= 35) {
-      return `🌟 CAMPIONE ACCESSIBILE: ${player.name} è top player ma costa "solo" €${player.price}M! Voto ${rating} garantito. ${positionTips[player.position as keyof typeof positionTips]}`;
+      return `🌟 CAMPIONE ACCESSIBILE: ${player.name} è top player ma costa "solo" ${player.price}FM! Voto ${rating} garantito. ${positionTips[player.position as keyof typeof positionTips]}`;
     } 
     
     if (rating >= 7.0 && player.price <= 20) {
-      return `💎 AFFARE INCREDIBILE: ${player.name} vale molto di più! Voto ${rating} a €${player.price}M. Ha fatto ${player.goals} gol e ${player.assists} assist. COMPRALO SUBITO!`;
+      return `💎 AFFARE INCREDIBILE: ${player.name} vale molto di più! Voto ${rating} a ${player.price}FM. Ha fatto ${player.goals} gol e ${player.assists} assist. COMPRALO SUBITO!`;
     } 
     
     if (player.price <= 8 && rating >= 6.0) {
-      return `🎯 PERFETTO PER BUDGET: ${player.name} costa pochissimo (€${player.price}M) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza rischi!`;
+      return `🎯 PERFETTO PER BUDGET: ${player.name} costa pochissimo (${player.price}FM) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza rischi!`;
     } 
     
     if (player.goals >= 12) {
@@ -448,10 +448,10 @@ export class DatabaseStorage implements IStorage {
     } 
     
     if (teamStats.remainingCredits < 50 && player.price <= 10) {
-      return `💸 PERFETTO PER FINIRE: Ti restano pochi crediti? ${player.name} costa solo €${player.price}M ma ha voto ${rating}. Completa la rosa senza spendere troppo!`;
+      return `💸 PERFETTO PER FINIRE: Ti restano pochi crediti? ${player.name} costa solo ${player.price}FM ma ha voto ${rating}. Completa la rosa senza spendere troppo!`;
     }
     
-    return `📈 BUONA SCELTA: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} solido. Voto ${rating}, ${player.goals} gol stagionali. A €${player.price}M può essere un buon investimento per il futuro!`;
+    return `📈 BUONA SCELTA: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} solido. Voto ${rating}, ${player.goals} gol stagionali. A ${player.price}FM può essere un buon investimento per il futuro!`;
   }
 
   private generateAdvancedRecommendationReason(player: Player, userTeam: UserTeam[]): string {
@@ -474,17 +474,17 @@ export class DatabaseStorage implements IStorage {
     
     // Consigli per principianti con spiegazioni chiare
     if (rating >= 7.5 && player.price <= 40) {
-      return `🌟 CAMPIONE: ${player.name} è uno dei migliori ${positionNames[player.position as keyof typeof positionNames]}! Ha un voto medio di ${rating} e costa solo €${player.price}M. ${positionExplanations[player.position as keyof typeof positionExplanations]}. CONSIGLIO: Compralo subito!`;
+      return `🌟 CAMPIONE: ${player.name} è uno dei migliori ${positionNames[player.position as keyof typeof positionNames]}! Ha un voto medio di ${rating} e costa solo ${player.price}FM. ${positionExplanations[player.position as keyof typeof positionExplanations]}. CONSIGLIO: Compralo subito!`;
     } else if (rating >= 7.0 && player.price <= 25) {
-      return `💰 AFFARE: ${player.name} è un ottimo ${positionNames[player.position as keyof typeof positionNames]} con voto ${rating} a prezzo conveniente (€${player.price}M). Ha fatto ${player.goals} gol e ${player.assists} assist. Perfetto per iniziare!`;
+      return `💰 AFFARE: ${player.name} è un ottimo ${positionNames[player.position as keyof typeof positionNames]} con voto ${rating} a prezzo conveniente (${player.price}FM). Ha fatto ${player.goals} gol e ${player.assists} assist. Perfetto per iniziare!`;
     } else if (player.price <= 10 && rating >= 6.0) {
-      return `🎯 BUDGET: ${player.name} costa poco (€${player.price}M) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza spendere troppo. ${positionExplanations[player.position as keyof typeof positionExplanations]}.`;
+      return `🎯 BUDGET: ${player.name} costa poco (${player.price}FM) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza spendere troppo. ${positionExplanations[player.position as keyof typeof positionExplanations]}.`;
     } else if (player.goals >= 10 || player.assists >= 8) {
-      return `⚽ BOMBER: ${player.name} ha segnato ${player.goals} gol e fatto ${player.assists} assist! ${positionNames[player.position as keyof typeof positionNames]} molto produttivo. Costa €${player.price}M ma i punti sono garantiti.`;
+      return `⚽ BOMBER: ${player.name} ha segnato ${player.goals} gol e fatto ${player.assists} assist! ${positionNames[player.position as keyof typeof positionNames]} molto produttivo. Costa ${player.price}FM ma i punti sono garantiti.`;
     } else if (player.matchesPlayed >= 15 && rating >= 6.5) {
-      return `🛡️ SICURO: ${player.name} gioca sempre (${player.matchesPlayed} partite) e ha voto ${rating}. ${positionNames[player.position as keyof typeof positionNames]} affidabile che non ti deluderà. Prezzo: €${player.price}M.`;
+      return `🛡️ SICURO: ${player.name} gioca sempre (${player.matchesPlayed} partite) e ha voto ${rating}. ${positionNames[player.position as keyof typeof positionNames]} affidabile che non ti deluderà. Prezzo: ${player.price}FM.`;
     } else {
-      return `📈 POTENZIALE: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} con buone prospettive. Voto ${rating}, ${player.goals} gol stagionali. Costa €${player.price}M - potrebbe essere una scommessa vincente!`;
+      return `📈 POTENZIALE: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} con buone prospettive. Voto ${rating}, ${player.goals} gol stagionali. Costa ${player.price}FM - potrebbe essere una scommessa vincente!`;
     }
   }
 

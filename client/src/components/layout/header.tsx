@@ -73,7 +73,7 @@ export function Header() {
             
             <div className="bg-muted px-3 py-1 rounded-full">
               <span className="text-sm font-semibold text-primary" data-testid="text-credits">
-                €{teamStats?.remainingCredits || 500}
+                {teamStats?.remainingCredits || 500}FM
               </span>
             </div>
 

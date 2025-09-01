@@ -66,7 +66,7 @@ export default function Market() {
     if (!teamStats || teamStats.remainingCredits < player.price) {
       toast({
         title: "Crediti insufficienti",
-        description: `Ti servono €${player.price} ma hai solo €${teamStats?.remainingCredits || 0}`,
+        description: `Ti servono ${player.price}FM ma hai solo ${teamStats?.remainingCredits || 0}FM`,
         variant: "destructive",
       });
       return;
@@ -103,7 +103,7 @@ export default function Market() {
               <div className="bg-muted px-4 py-2 rounded-lg">
                 <span className="text-sm text-muted-foreground">Crediti disponibili: </span>
                 <span className="text-lg font-semibold text-primary" data-testid="text-available-credits">
-                  €{teamStats?.remainingCredits || 500}
+                  {teamStats?.remainingCredits || 500}FM
                 </span>
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function Market() {
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-chart-2">
-                    €{teamStats?.averageRating?.toFixed(1) || "0.0"}
+                    {teamStats?.averageRating?.toFixed(1) || "0.0"}
                   </div>
                   <div className="text-sm text-muted-foreground">Media voti squadra</div>
                 </div>

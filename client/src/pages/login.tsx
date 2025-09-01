@@ -48,7 +48,7 @@ export default function Login() {
       setLocation("/");
       toast({
         title: "Registration successful",
-        description: "Welcome to Fantacalcio Serie A! You have €500 credits to start.",
+        description: "Welcome to Fantacalcio Serie A! You have 500FM credits to start.",
       });
     } catch (error) {
       toast({
