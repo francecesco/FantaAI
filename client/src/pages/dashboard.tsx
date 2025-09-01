@@ -14,7 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { TeamStats, UserTeam, Player, PlayerRecommendation, MarketActivity } from "@shared/schema";
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -27,17 +27,17 @@ export default function Dashboard() {
 
   const { data: teamStats } = useQuery<TeamStats>({
     queryKey: ["/api/team", user?.id, "stats"],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: userTeam = [] } = useQuery<(UserTeam & { player: Player })[]>({
     queryKey: ["/api/team", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: recommendations = [] } = useQuery<PlayerRecommendation[]>({
     queryKey: ["/api/recommendations", user?.id],
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const { data: marketActivity = [] } = useQuery<MarketActivity[]>({
@@ -46,8 +46,7 @@ export default function Dashboard() {
 
   const addPlayerMutation = useMutation({
     mutationFn: async ({ playerId, price }: { playerId: string; price: number }) => {
-      const response = await apiRequest("POST", "/api/team/add-player", {
-        userId: user?.id,
+      const response = await apiRequest("POST", `/api/team/${user?.id}/players`, {
         playerId,
         purchasePrice: price,
       });
@@ -71,7 +70,7 @@ export default function Dashboard() {
     },
   });
 
-  if (!user) {
+  if (!user?.id) {
     return null;
   }
 
@@ -329,7 +328,7 @@ export default function Dashboard() {
                           €{(activity.price / 1000000).toFixed(0)}M
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {Math.floor((Date.now() - activity.timestamp.getTime()) / 60000)} min fa
+                          {Math.floor((Date.now() - new Date(activity.timestamp).getTime()) / 60000)} min fa
                         </div>
                       </div>
                     </div>

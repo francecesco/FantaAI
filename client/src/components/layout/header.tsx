@@ -45,16 +45,16 @@ export function Header() {
           <nav className="hidden md:flex space-x-8">
             {navigation.map((item) => (
               <Link key={item.name} href={item.href}>
-                <a 
+                <span 
                   className={`${
                     item.active 
                       ? "text-primary font-medium border-b-2 border-primary" 
                       : "text-muted-foreground hover:text-foreground"
-                  } px-1 pb-2 transition-colors`}
+                  } px-1 pb-2 transition-colors cursor-pointer`}
                   data-testid={`nav-${item.name.toLowerCase()}`}
                 >
                   {item.name}
-                </a>
+                </span>
               </Link>
             ))}
           </nav>
