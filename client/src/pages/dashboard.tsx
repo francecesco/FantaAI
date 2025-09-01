@@ -113,7 +113,7 @@ export default function Dashboard() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
             <div>
               <h2 className="text-3xl font-bold text-foreground">Dashboard</h2>
-              <p className="text-muted-foreground mt-1">Gestisci la tua squadra per la Serie A 2024/25</p>
+              <p className="text-muted-foreground mt-1">Gestisci la tua squadra per la Serie A 2024/25 con dati reali aggiornati</p>
             </div>
             <div className="mt-4 lg:mt-0">
               <Button 

@@ -96,7 +96,7 @@ export class FootballApiService {
   private readonly baseUrl = "https://v3.football.api-sports.io";
   private readonly apiKey = process.env.API_FOOTBALL_KEY;
   private readonly serieALeagueId = 135;
-  private readonly currentSeason = 2024;
+  private readonly currentSeason = 2025;
 
   private async makeRequest(endpoint: string, params: Record<string, any> = {}): Promise<any> {
     const url = new URL(`${this.baseUrl}${endpoint}`);

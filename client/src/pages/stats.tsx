@@ -52,7 +52,7 @@ export default function Stats() {
       queryClient.invalidateQueries({ queryKey: ["/api/recommendations", user?.id] });
       toast({
         title: "Dati aggiornati",
-        description: "I dati dei giocatori sono stati aggiornati dall'API Football",
+        description: "Rose e statistiche Serie A 2024/25 aggiornate con dati reali",
       });
     },
     onError: () => {
@@ -109,7 +109,7 @@ export default function Stats() {
                 data-testid="button-refresh-data"
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${refreshPlayersMutation.isPending ? 'animate-spin' : ''}`} />
-                Aggiorna Dati API
+                Aggiorna da Serie A
               </Button>
             </div>
           </div>

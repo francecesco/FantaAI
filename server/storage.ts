@@ -191,8 +191,34 @@ export class DatabaseStorage implements IStorage {
 
   async refreshPlayersFromAPI(): Promise<void> {
     try {
-      await footballApi.refreshPlayerData();
-      console.log("Player data refreshed from API Football");
+      console.log("Refreshing players from API Football...");
+      
+      // Get fresh data from API
+      const playersData = await footballApi.refreshPlayerData();
+      
+      // Clear existing players
+      await db.delete(players);
+      console.log("Cleared existing player data");
+      
+      // Insert fresh data
+      for (const playerData of playersData) {
+        await db.insert(players).values({
+          id: randomUUID(),
+          name: playerData.name,
+          position: playerData.position,
+          team: playerData.team,
+          price: playerData.price,
+          rating: playerData.rating.toString(),
+          goals: playerData.goals || 0,
+          assists: playerData.assists || 0,
+          yellowCards: playerData.yellowCards || 0,
+          redCards: playerData.redCards || 0,
+          matchesPlayed: playerData.matchesPlayed || 0,
+          isActive: true,
+        });
+      }
+      
+      console.log(`Refreshed ${playersData.length} players from API Football`);
     } catch (error) {
       console.error("Failed to refresh player data:", error);
       throw error;
