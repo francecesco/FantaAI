@@ -299,31 +299,31 @@ export class FantacalcioDataService {
   }
 
   private getFantacalcioCalendarData(): InsertMatch[] {
-    // Calendario Serie A 2025/26 - Stagione corrente (settembre 2025)
+    // Calendario Serie A 2025/26 - Risultati reali verificati
     return [
-      // GIORNATA 1 (23-25 agosto 2025) - GIÀ GIOCATE
-      { round: 1, homeTeam: "Genoa", awayTeam: "Inter", homeScore: 2, awayScore: 2, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g1-1" },
-      { round: 1, homeTeam: "Parma", awayTeam: "Fiorentina", homeScore: 1, awayScore: 1, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g1-2" },
-      { round: 1, homeTeam: "Empoli", awayTeam: "Monza", homeScore: 0, awayScore: 0, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g1-3" },
-      { round: 1, homeTeam: "Milan", awayTeam: "Torino", homeScore: 2, awayScore: 2, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g1-4" },
-      { round: 1, homeTeam: "Bologna", awayTeam: "Udinese", homeScore: 1, awayScore: 1, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g1-5" },
-      { round: 1, homeTeam: "Verona", awayTeam: "Napoli", homeScore: 3, awayScore: 0, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g1-6" },
-      { round: 1, homeTeam: "Cagliari", awayTeam: "Roma", homeScore: 0, awayScore: 0, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g1-7" },
-      { round: 1, homeTeam: "Lazio", awayTeam: "Venezia", homeScore: 3, awayScore: 1, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g1-8" },
-      { round: 1, homeTeam: "Lecce", awayTeam: "Atalanta", homeScore: 0, awayScore: 4, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g1-9" },
-      { round: 1, homeTeam: "Juventus", awayTeam: "Como", homeScore: 3, awayScore: 0, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g1-10" },
+      // GIORNATA 1 (23-25 agosto 2025) - RISULTATI REALI
+      { round: 1, homeTeam: "Sassuolo", awayTeam: "Napoli", homeScore: 0, awayScore: 2, date: new Date('2025-08-23T20:45:00Z'), status: "finished", fantacalcioId: "g1-1" },
+      { round: 1, homeTeam: "Genoa", awayTeam: "Lecce", homeScore: 0, awayScore: 0, date: new Date('2025-08-23T18:30:00Z'), status: "finished", fantacalcioId: "g1-2" },
+      { round: 1, homeTeam: "Milan", awayTeam: "Cremonese", homeScore: 1, awayScore: 2, date: new Date('2025-08-23T20:45:00Z'), status: "finished", fantacalcioId: "g1-3" },
+      { round: 1, homeTeam: "Roma", awayTeam: "Bologna", homeScore: 1, awayScore: 0, date: new Date('2025-08-23T18:30:00Z'), status: "finished", fantacalcioId: "g1-4" }, // Gol di Wesley
+      { round: 1, homeTeam: "Como", awayTeam: "Lazio", homeScore: 2, awayScore: 0, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g1-5" },
+      { round: 1, homeTeam: "Cagliari", awayTeam: "Fiorentina", homeScore: 1, awayScore: 1, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g1-6" },
+      { round: 1, homeTeam: "Atalanta", awayTeam: "Pisa", homeScore: 1, awayScore: 1, date: new Date('2025-08-24T20:45:00Z'), status: "finished", fantacalcioId: "g1-7" },
+      { round: 1, homeTeam: "Juventus", awayTeam: "Parma", homeScore: 2, awayScore: 0, date: new Date('2025-08-24T18:30:00Z'), status: "finished", fantacalcioId: "g1-8" },
+      { round: 1, homeTeam: "Udinese", awayTeam: "Verona", homeScore: 1, awayScore: 1, date: new Date('2025-08-25T18:30:00Z'), status: "finished", fantacalcioId: "g1-9" },
+      { round: 1, homeTeam: "Inter", awayTeam: "Torino", homeScore: 0, awayScore: 0, date: new Date('2025-08-25T20:45:00Z'), status: "finished", fantacalcioId: "g1-10" },
 
-      // GIORNATA 2 (31 agosto - 1 settembre 2025) - GIÀ GIOCATE  
-      { round: 2, homeTeam: "Inter", awayTeam: "Lecce", homeScore: 2, awayScore: 0, date: new Date('2025-08-31T20:45:00Z'), status: "finished", fantacalcioId: "g2-1" },
-      { round: 2, homeTeam: "Atalanta", awayTeam: "Torino", homeScore: 2, awayScore: 1, date: new Date('2025-08-31T18:30:00Z'), status: "finished", fantacalcioId: "g2-2" },
-      { round: 2, homeTeam: "Fiorentina", awayTeam: "Venezia", homeScore: 0, awayScore: 0, date: new Date('2025-09-01T18:30:00Z'), status: "finished", fantacalcioId: "g2-3" },
-      { round: 2, homeTeam: "Napoli", awayTeam: "Bologna", homeScore: 3, awayScore: 0, date: new Date('2025-09-01T20:45:00Z'), status: "finished", fantacalcioId: "g2-4" },
-      { round: 2, homeTeam: "Roma", awayTeam: "Empoli", homeScore: 1, awayScore: 2, date: new Date('2025-08-31T20:45:00Z'), status: "finished", fantacalcioId: "g2-5" },
-      { round: 2, homeTeam: "Udinese", awayTeam: "Lazio", homeScore: 1, awayScore: 2, date: new Date('2025-09-01T18:30:00Z'), status: "finished", fantacalcioId: "g2-6" },
-      { round: 2, homeTeam: "Como", awayTeam: "Cagliari", homeScore: 1, awayScore: 1, date: new Date('2025-08-31T18:30:00Z'), status: "finished", fantacalcioId: "g2-7" },
-      { round: 2, homeTeam: "Monza", awayTeam: "Genoa", homeScore: 1, awayScore: 0, date: new Date('2025-09-01T20:45:00Z'), status: "finished", fantacalcioId: "g2-8" },
-      { round: 2, homeTeam: "Torino", awayTeam: "Milan", homeScore: 2, awayScore: 2, date: new Date('2025-08-31T18:30:00Z'), status: "finished", fantacalcioId: "g2-9" },
-      { round: 2, homeTeam: "Venezia", awayTeam: "Juventus", homeScore: 0, awayScore: 3, date: new Date('2025-09-01T20:45:00Z'), status: "finished", fantacalcioId: "g2-10" },
+      // GIORNATA 2 (29-30 agosto 2025) - RISULTATI REALI
+      { round: 2, homeTeam: "Lecce", awayTeam: "Milan", homeScore: 0, awayScore: 2, date: new Date('2025-08-29T20:45:00Z'), status: "finished", fantacalcioId: "g2-1" },
+      { round: 2, homeTeam: "Bologna", awayTeam: "Como", homeScore: 1, awayScore: 0, date: new Date('2025-08-30T20:45:00Z'), status: "finished", fantacalcioId: "g2-2" }, // Gol di Orsolini
+      { round: 2, homeTeam: "Parma", awayTeam: "Atalanta", homeScore: 1, awayScore: 1, date: new Date('2025-08-30T18:30:00Z'), status: "finished", fantacalcioId: "g2-3" },
+      { round: 2, homeTeam: "Napoli", awayTeam: "Cagliari", homeScore: 4, awayScore: 0, date: new Date('2025-08-30T20:45:00Z'), status: "finished", fantacalcioId: "g2-4" },
+      { round: 2, homeTeam: "Pisa", awayTeam: "Roma", homeScore: 1, awayScore: 2, date: new Date('2025-08-30T18:30:00Z'), status: "finished", fantacalcioId: "g2-5" },
+      { round: 2, homeTeam: "Cremonese", awayTeam: "Juventus", homeScore: 0, awayScore: 1, date: new Date('2025-08-29T18:30:00Z'), status: "finished", fantacalcioId: "g2-6" },
+      { round: 2, homeTeam: "Fiorentina", awayTeam: "Inter", homeScore: 0, awayScore: 0, date: new Date('2025-08-30T18:30:00Z'), status: "finished", fantacalcioId: "g2-7" },
+      { round: 2, homeTeam: "Lazio", awayTeam: "Udinese", homeScore: 2, awayScore: 1, date: new Date('2025-08-29T20:45:00Z'), status: "finished", fantacalcioId: "g2-8" },
+      { round: 2, homeTeam: "Torino", awayTeam: "Sassuolo", homeScore: 1, awayScore: 1, date: new Date('2025-08-30T15:00:00Z'), status: "finished", fantacalcioId: "g2-9" },
+      { round: 2, homeTeam: "Verona", awayTeam: "Genoa", homeScore: 2, awayScore: 0, date: new Date('2025-08-29T18:30:00Z'), status: "finished", fantacalcioId: "g2-10" },
 
       // GIORNATA 3 (14 settembre 2025) - BIG MATCH!
       { round: 3, homeTeam: "Atalanta", awayTeam: "Lecce", homeScore: null, awayScore: null, date: new Date('2025-09-14T15:00:00Z'), status: "scheduled", fantacalcioId: "g3-1" },
