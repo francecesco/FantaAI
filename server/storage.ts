@@ -191,7 +191,7 @@ export class DatabaseStorage implements IStorage {
 
   async refreshPlayersFromAPI(): Promise<void> {
     try {
-      console.log("Refreshing players from API Football...");
+      console.log("Aggiornamento dati giocatori da Transfermarkt...");
       
       // Get fresh data from API
       const playersData = await footballApi.refreshPlayerData();
@@ -218,7 +218,7 @@ export class DatabaseStorage implements IStorage {
         });
       }
       
-      console.log(`Refreshed ${playersData.length} players from API Football`);
+      console.log(`Aggiornati ${playersData.length} giocatori Serie A da Transfermarkt`);
     } catch (error) {
       console.error("Failed to refresh player data:", error);
       throw error;
