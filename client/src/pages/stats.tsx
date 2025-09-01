@@ -52,7 +52,7 @@ export default function Stats() {
       queryClient.invalidateQueries({ queryKey: ["/api/recommendations", user?.id] });
       toast({
         title: "Dati aggiornati",
-        description: "Rose e statistiche Serie A 2024/25 aggiornate con dati reali",
+        description: "Rose e statistiche Serie A 2025/26 aggiornate con dati reali",
       });
     },
     onError: () => {

@@ -75,7 +75,7 @@ export default function Login() {
             </div>
             <CardTitle className="text-2xl font-bold">Fantacalcio Serie A</CardTitle>
             <CardDescription>
-              Gestisci la tua squadra per la Serie A 2024/25 con dati reali
+              Gestisci la tua squadra per la Serie A 2025/26 con dati reali
             </CardDescription>
           </CardHeader>
 
