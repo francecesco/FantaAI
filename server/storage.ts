@@ -266,20 +266,48 @@ export class DatabaseStorage implements IStorage {
     
     const availablePlayers = allPlayers.filter(p => !ownedPlayerIds.has(p.id));
 
-    // Enhanced recommendation algorithm
+    // Enhanced recommendation algorithm per principianti
     const recommendations = availablePlayers
       .map(player => {
-        const valueScore = this.calculateAdvancedValueScore(player, userTeamData, teamStats);
+        const valueScore = this.calculateBeginnerValueScore(player, userTeamData, teamStats);
         return {
           player,
           valueScore,
-          reason: this.generateAdvancedRecommendationReason(player, userTeamData),
+          reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
         };
       })
       .sort((a, b) => b.valueScore - a.valueScore)
       .slice(0, 8);
 
     return recommendations;
+  }
+
+  private calculateBeginnerValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
+    const rating = parseFloat(player.rating);
+    const efficiency = player.matchesPlayed > 0 ? (player.goals + player.assists) / player.matchesPlayed : 0;
+    
+    // Per principianti: priorità a giocatori semplici e affidabili
+    let score = rating * 10; // Voto base è la priorità principale
+    
+    // Bonus per giocatori produttivi (gol + assist)
+    score += (player.goals + player.assists) * 5;
+    
+    // Bonus per giocatori che giocano sempre (affidabilità)
+    if (player.matchesPlayed >= 15) score += 20;
+    
+    // Penalità per prezzi troppo alti (principianti hanno budget limitato)
+    if (player.price > 40) score -= 30;
+    else if (player.price > 25) score -= 10;
+    
+    // Bonus per rapporto qualità-prezzo
+    if (rating >= 7.0 && player.price <= 20) score += 25;
+    if (rating >= 6.5 && player.price <= 10) score += 15;
+    
+    // Analisi posizione necessaria per la squadra
+    const positionNeed = this.getBeginnerPositionNeed(player.position, userTeam);
+    score *= positionNeed;
+    
+    return Math.max(score, 0);
   }
 
   private calculateAdvancedValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
@@ -320,27 +348,117 @@ export class DatabaseStorage implements IStorage {
     return needs[position as keyof typeof needs] || 1.0;
   }
 
+  private getBeginnerPositionNeed(position: string, userTeam: UserTeam[]): number {
+    // Per principianti: conta solo i giocatori attuali per posizione
+    const currentCounts = {
+      P: 0, D: 0, C: 0, A: 0
+    };
+    
+    // Nota: In implementazione completa, si dovrebbe fare join con la tabella players
+    // Per ora usiamo una logica semplificata
+    
+    const targetCounts = { P: 3, D: 8, C: 8, A: 6 };
+    const currentCount = currentCounts[position as keyof typeof currentCounts] || 0;
+    const targetCount = targetCounts[position as keyof typeof targetCounts] || 0;
+    
+    // Priorità massima per posizioni completamente vuote
+    if (currentCount === 0) return 2.0;
+    
+    // Alta priorità per posizioni sotto il minimo
+    if (currentCount < Math.ceil(targetCount * 0.4)) return 1.8;
+    
+    // Media priorità per posizioni incomplete
+    if (currentCount < targetCount) return 1.3;
+    
+    // Bassa priorità per posizioni complete
+    return 0.7;
+  }
+
+  private generateBeginnerRecommendationReason(player: Player, userTeam: UserTeam[], teamStats: TeamStats): string {
+    const rating = parseFloat(player.rating);
+    const efficiency = player.matchesPlayed > 0 ? (player.goals + player.assists) / player.matchesPlayed : 0;
+    
+    const positionNames = { 
+      P: "Portiere", 
+      D: "Difensore", 
+      C: "Centrocampista", 
+      A: "Attaccante" 
+    };
+    
+    const positionTips = {
+      P: "🥅 I portieri guadagnano punti con parate e rigori parati. Cerca chi gioca sempre!",
+      D: "🛡️ I difensori prendono bonus con porta inviolata e gol. Scegli titolari delle big!", 
+      C: "⚡ I centrocampisti sono jolly: assist, gol e gioco. I più affidabili per punti!",
+      A: "🚀 Gli attaccanti vivono di gol. Meglio 1 bomber da €40M che 2 da €20M!"
+    };
+    
+    // Consigli specifici per principianti
+    if (userTeam.length === 0) {
+      return `🎯 PRIMO ACQUISTO: Inizia con ${player.name} (${positionNames[player.position as keyof typeof positionNames]})! Voto ${rating}, costa €${player.price}M. ${positionTips[player.position as keyof typeof positionTips]}`;
+    }
+    
+    if (rating >= 7.5 && player.price <= 35) {
+      return `🌟 CAMPIONE ACCESSIBILE: ${player.name} è top player ma costa "solo" €${player.price}M! Voto ${rating} garantito. ${positionTips[player.position as keyof typeof positionTips]}`;
+    } 
+    
+    if (rating >= 7.0 && player.price <= 20) {
+      return `💎 AFFARE INCREDIBILE: ${player.name} vale molto di più! Voto ${rating} a €${player.price}M. Ha fatto ${player.goals} gol e ${player.assists} assist. COMPRALO SUBITO!`;
+    } 
+    
+    if (player.price <= 8 && rating >= 6.0) {
+      return `🎯 PERFETTO PER BUDGET: ${player.name} costa pochissimo (€${player.price}M) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza rischi!`;
+    } 
+    
+    if (player.goals >= 12) {
+      return `⚽ BOMBER VERO: ${player.name} ha già ${player.goals} gol! ${positionNames[player.position as keyof typeof positionNames]} che segna sempre. I gol valgono +3 punti ciascuno!`;
+    } 
+    
+    if (player.assists >= 10) {
+      return `🎯 RE DEGLI ASSIST: ${player.name} ha servito ${player.assists} assist! Gli assist valgono +1 punto. ${positionNames[player.position as keyof typeof positionNames]} che fa giocare bene la squadra.`;
+    } 
+    
+    if (player.matchesPlayed >= 20 && rating >= 6.5) {
+      return `🛡️ CERTEZZA ASSOLUTA: ${player.name} ha giocato ${player.matchesPlayed} partite (su 25 max)! Voto ${rating} stabile. Mai infortunato, sempre titolare.`;
+    } 
+    
+    if (teamStats.remainingCredits < 50 && player.price <= 10) {
+      return `💸 PERFETTO PER FINIRE: Ti restano pochi crediti? ${player.name} costa solo €${player.price}M ma ha voto ${rating}. Completa la rosa senza spendere troppo!`;
+    }
+    
+    return `📈 BUONA SCELTA: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} solido. Voto ${rating}, ${player.goals} gol stagionali. A €${player.price}M può essere un buon investimento per il futuro!`;
+  }
+
   private generateAdvancedRecommendationReason(player: Player, userTeam: UserTeam[]): string {
     const rating = parseFloat(player.rating);
     const efficiency = player.matchesPlayed > 0 ? (player.goals + player.assists) / player.matchesPlayed : 0;
     
-    const positionNames = { P: "portieri", D: "difensori", C: "centrocampisti", A: "attaccanti" };
-    const currentCount = userTeam.filter(ut => {
-      // Simplified - in real implementation would join tables
-      return true; // player.position check
-    }).length;
-    const minNeeded = { P: 3, D: 8, C: 8, A: 6 }[player.position] || 0;
+    const positionNames = { 
+      P: "Portiere", 
+      D: "Difensore", 
+      C: "Centrocampista", 
+      A: "Attaccante" 
+    };
     
-    if (rating >= 7.5 && efficiency >= 0.8) {
-      return `⭐ Top player: rating ${rating}, ${efficiency.toFixed(1)} gol+assist/partita. Investimento di qualità.`;
-    } else if (rating >= 7.0 && player.price <= 30) {
-      return `💎 Affare: rating ${rating} a solo €${player.price}. Ottimo rapporto qualità-prezzo.`;
-    } else if (player.price <= 15) {
-      return `🔥 Budget: opzione economica per completare la rosa. Rating ${rating}, prezzo accessibile.`;
-    } else if (efficiency >= 0.6) {
-      return `⚽ Produttivo: ${player.goals} gol e ${player.assists} assist in ${player.matchesPlayed} partite.`;
+    const positionExplanations = {
+      P: "I portieri sono fondamentali: parano i rigori e prendono voti alti con le parate",
+      D: "I difensori segnano punti con gol e mantenendo la porta inviolata", 
+      C: "I centrocampisti sono versatili: assist, gol e tanto gioco",
+      A: "Gli attaccanti sono i bomber: segnano i gol che vincono le partite"
+    };
+    
+    // Consigli per principianti con spiegazioni chiare
+    if (rating >= 7.5 && player.price <= 40) {
+      return `🌟 CAMPIONE: ${player.name} è uno dei migliori ${positionNames[player.position as keyof typeof positionNames]}! Ha un voto medio di ${rating} e costa solo €${player.price}M. ${positionExplanations[player.position as keyof typeof positionExplanations]}. CONSIGLIO: Compralo subito!`;
+    } else if (rating >= 7.0 && player.price <= 25) {
+      return `💰 AFFARE: ${player.name} è un ottimo ${positionNames[player.position as keyof typeof positionNames]} con voto ${rating} a prezzo conveniente (€${player.price}M). Ha fatto ${player.goals} gol e ${player.assists} assist. Perfetto per iniziare!`;
+    } else if (player.price <= 10 && rating >= 6.0) {
+      return `🎯 BUDGET: ${player.name} costa poco (€${player.price}M) ma è affidabile (voto ${rating}). Ideale per completare la rosa senza spendere troppo. ${positionExplanations[player.position as keyof typeof positionExplanations]}.`;
+    } else if (player.goals >= 10 || player.assists >= 8) {
+      return `⚽ BOMBER: ${player.name} ha segnato ${player.goals} gol e fatto ${player.assists} assist! ${positionNames[player.position as keyof typeof positionNames]} molto produttivo. Costa €${player.price}M ma i punti sono garantiti.`;
+    } else if (player.matchesPlayed >= 15 && rating >= 6.5) {
+      return `🛡️ SICURO: ${player.name} gioca sempre (${player.matchesPlayed} partite) e ha voto ${rating}. ${positionNames[player.position as keyof typeof positionNames]} affidabile che non ti deluderà. Prezzo: €${player.price}M.`;
     } else {
-      return `Giocatore affidabile con esperienza in Serie A. Rating ${rating}.`;
+      return `📈 POTENZIALE: ${player.name} è un ${positionNames[player.position as keyof typeof positionNames]} con buone prospettive. Voto ${rating}, ${player.goals} gol stagionali. Costa €${player.price}M - potrebbe essere una scommessa vincente!`;
     }
   }
 

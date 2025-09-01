@@ -11,6 +11,7 @@ interface RecommendationCardProps {
 
 export function RecommendationCard({ recommendation, onAddPlayer }: RecommendationCardProps) {
   const { player, reason, valueScore } = recommendation;
+  const rating = parseFloat(player.rating);
 
   return (
     <Card className="p-4 hover:bg-muted/30 transition-colors" data-testid={`card-recommendation-${player.id}`}>
@@ -41,8 +42,20 @@ export function RecommendationCard({ recommendation, onAddPlayer }: Recommendati
         </div>
       </div>
       
-      <div className="text-sm text-muted-foreground mb-3" data-testid={`text-recommendation-reason-${player.id}`}>
+      <div className="text-sm text-muted-foreground mb-3 leading-relaxed" data-testid={`text-recommendation-reason-${player.id}`}>
         {reason}
+      </div>
+      
+      {/* Statistiche spiegate per principianti */}
+      <div className="grid grid-cols-2 gap-3 mb-3 text-xs">
+        <div className="bg-muted/50 p-2 rounded">
+          <span className="font-medium text-foreground">Voto: {rating}</span>
+          <p className="text-muted-foreground">Media voti stagionale</p>
+        </div>
+        <div className="bg-muted/50 p-2 rounded">
+          <span className="font-medium text-foreground">{player.goals}G + {player.assists}A</span>
+          <p className="text-muted-foreground">Gol e assist (danno bonus)</p>
+        </div>
       </div>
       
       {onAddPlayer && (

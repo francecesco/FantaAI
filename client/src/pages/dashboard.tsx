@@ -125,6 +125,49 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Tutorial per Principianti */}
+          {userTeam.length === 0 && (
+            <Card className="mb-6 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  🎓 Guida per Principianti
+                </CardTitle>
+                <CardDescription>
+                  Benvenuto nel Fantacalcio! Ecco come iniziare:
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">🏗️ Come costruire la squadra:</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• <strong>3 Portieri</strong> - Almeno uno titolare forte</li>
+                      <li>• <strong>8 Difensori</strong> - Mix di titolari e riserve</li>
+                      <li>• <strong>8 Centrocampisti</strong> - I più versatili</li>
+                      <li>• <strong>6 Attaccanti</strong> - I bomber che segnano</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-foreground">💡 Consigli per vincere:</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Il <strong>voto</strong> è tutto: più alto = più punti</li>
+                      <li>• <strong>Gol e assist</strong> danno bonus speciali</li>
+                      <li>• Scegli giocatori che <strong>giocano sempre</strong></li>
+                      <li>• Bilancia: <strong>campioni costosi + affari</strong></li>
+                    </ul>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setLocation("/market")}
+                  className="w-full mt-4"
+                  data-testid="button-start-building"
+                >
+                  🚀 Inizia a Costruire la Squadra
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
@@ -275,15 +318,18 @@ export default function Dashboard() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Consigli AI</CardTitle>
+                  <CardTitle className="text-lg">🤖 Consigli AI per Principianti</CardTitle>
                   <span className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full font-medium">
-                    Aggiornato
+                    Intelligenza Artificiale
                   </span>
                 </div>
+                <CardDescription>
+                  L'AI analizza tutti i giocatori e ti consiglia i migliori per la tua squadra
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recommendations.slice(0, 2).map((recommendation) => (
+                  {recommendations.slice(0, 3).map((recommendation) => (
                     <RecommendationCard
                       key={recommendation.player.id}
                       recommendation={recommendation}
@@ -291,10 +337,64 @@ export default function Dashboard() {
                     />
                   ))}
                   {recommendations.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4" data-testid="no-recommendations">
-                      Nessun consiglio disponibile
-                    </p>
+                    <div className="text-center py-6" data-testid="no-recommendations">
+                      <p className="text-muted-foreground mb-2">Nessun consiglio disponibile</p>
+                      <p className="text-xs text-muted-foreground">Aggiungi alcuni giocatori per ricevere consigli personalizzati</p>
+                    </div>
                   )}
+                  {recommendations.length > 0 && (
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setLocation("/market")}
+                      data-testid="button-see-all-recommendations"
+                    >
+                      Vedi Tutti i Consigli nel Mercato
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Consigli Tattici */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">⚽ Consigli Tattici</CardTitle>
+                <CardDescription>
+                  Strategie per massimizzare i punti della tua squadra
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                      🏆 Formazione 3-5-2 (Consigliata)
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      La formazione più equilibrata: 3 difensori, 5 centrocampisti, 2 attaccanti. 
+                      Perfetta per principianti perché i centrocampisti prendono voti più stabili.
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                      💰 Gestione Budget
+                    </h4>
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      Regola d'oro: spendi €200-250M per 2-3 campioni, poi completa con giocatori da €5-15M. 
+                      Non comprare solo stelle costose!
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                      🎯 Priorità Acquisti
+                    </h4>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                      1° Portiere titolare forte, 2° Attaccanti che segnano sempre, 
+                      3° Centrocampisti jolly, 4° Difensori delle big.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
