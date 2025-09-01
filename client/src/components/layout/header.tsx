@@ -22,6 +22,8 @@ export function Header() {
     { name: "Dashboard", href: "/", active: location === "/" },
     { name: "Rosa", href: "/roster", active: location === "/roster" },
     { name: "Mercato", href: "/market", active: location === "/market" },
+    { name: "Statistiche", href: "/stats", active: location === "/stats" },
+    { name: "Simula", href: "/simulation", active: location === "/simulation" },
   ];
 
   return (

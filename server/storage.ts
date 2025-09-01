@@ -1,5 +1,6 @@
 import { type User, type InsertUser, type Player, type InsertPlayer, type UserTeam, type InsertUserTeam, type Transaction, type InsertTransaction, type TeamStats, type PlayerRecommendation, type MarketActivity } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { footballApi } from "./football-api";
 
 export interface IStorage {
   // User operations
@@ -28,6 +29,9 @@ export interface IStorage {
   // Recommendations and market
   getPlayerRecommendations(userId: string): Promise<PlayerRecommendation[]>;
   getMarketActivity(): Promise<MarketActivity[]>;
+
+  // Player data refresh
+  refreshPlayersFromAPI(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -44,50 +48,26 @@ export class MemStorage implements IStorage {
     this.initializePlayers();
   }
 
-  private initializePlayers() {
-    const serieAPlayers: InsertPlayer[] = [
-      // Portieri
-      { name: "Gianluigi Donnarumma", position: "P", team: "PSG", price: 30, rating: "6.9", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Samir Handanović", position: "P", team: "Inter", price: 18, rating: "6.5", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 8 },
-      { name: "Wojciech Szczęsny", position: "P", team: "Juventus", price: 22, rating: "6.7", goals: 0, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Alex Meret", position: "P", team: "Napoli", price: 12, rating: "6.7", goals: 0, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Mike Maignan", position: "P", team: "Milan", price: 25, rating: "7.1", goals: 0, assists: 0, yellowCards: 0, redCards: 0, matchesPlayed: 8 },
-
-      // Difensori
-      { name: "Alessandro Bastoni", position: "D", team: "Inter", price: 35, rating: "7.2", goals: 2, assists: 3, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Fikayo Tomori", position: "D", team: "Milan", price: 28, rating: "6.8", goals: 1, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Kalidou Koulibaly", position: "D", team: "Chelsea", price: 32, rating: "7.0", goals: 1, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8 },
-      { name: "Davide Calabria", position: "D", team: "Milan", price: 18, rating: "6.6", goals: 0, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Giorgio Scalvini", position: "D", team: "Atalanta", price: 15, rating: "6.8", goals: 1, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Alessandro Florenzi", position: "D", team: "Milan", price: 12, rating: "6.4", goals: 0, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8 },
-      { name: "Gleison Bremer", position: "D", team: "Juventus", price: 30, rating: "7.0", goals: 2, assists: 0, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Rafael Tolói", position: "D", team: "Atalanta", price: 16, rating: "6.7", goals: 1, assists: 0, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-
-      // Centrocampisti
-      { name: "Nicolò Barella", position: "C", team: "Inter", price: 45, rating: "7.5", goals: 3, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Sandro Tonali", position: "C", team: "Newcastle", price: 38, rating: "7.1", goals: 1, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Lorenzo Pellegrini", position: "C", team: "Roma", price: 40, rating: "7.3", goals: 2, assists: 3, yellowCards: 3, redCards: 0, matchesPlayed: 8 },
-      { name: "Khvicha Kvaratskhelia", position: "C", team: "Napoli", price: 25, rating: "7.8", goals: 4, assists: 5, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Matteo Zaccagni", position: "C", team: "Lazio", price: 22, rating: "6.9", goals: 2, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Hakan Çalhanoğlu", position: "C", team: "Inter", price: 35, rating: "7.2", goals: 2, assists: 3, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Sergej Milinković-Savić", position: "C", team: "Al-Hilal", price: 40, rating: "7.4", goals: 3, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Franck Kessié", position: "C", team: "Barcelona", price: 28, rating: "6.8", goals: 1, assists: 1, yellowCards: 3, redCards: 0, matchesPlayed: 8 },
-
-      // Attaccanti
-      { name: "Victor Osimhen", position: "A", team: "Napoli", price: 60, rating: "8.2", goals: 12, assists: 2, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Lautaro Martínez", position: "A", team: "Inter", price: 55, rating: "7.9", goals: 10, assists: 3, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Dušan Vlahović", position: "A", team: "Juventus", price: 52, rating: "7.6", goals: 8, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Ciro Immobile", position: "A", team: "Lazio", price: 35, rating: "7.2", goals: 6, assists: 2, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Federico Chiesa", position: "A", team: "Juventus", price: 42, rating: "7.4", goals: 4, assists: 3, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-      { name: "Rafael Leão", position: "A", team: "Milan", price: 48, rating: "7.8", goals: 5, assists: 4, yellowCards: 2, redCards: 0, matchesPlayed: 8 },
-      { name: "Nicolò Zaniolo", position: "A", team: "Aston Villa", price: 35, rating: "7.1", goals: 3, assists: 2, yellowCards: 3, redCards: 0, matchesPlayed: 8 },
-      { name: "Tammy Abraham", position: "A", team: "Roma", price: 30, rating: "6.9", goals: 4, assists: 1, yellowCards: 1, redCards: 0, matchesPlayed: 8 },
-    ];
-
-    serieAPlayers.forEach(player => {
-      const id = randomUUID();
-      this.players.set(id, { ...player, id });
-    });
+  private async initializePlayers() {
+    try {
+      const playersData = await footballApi.refreshPlayerData();
+      playersData.forEach(player => {
+        const id = randomUUID();
+        this.players.set(id, { 
+          ...player, 
+          id,
+          goals: player.goals ?? 0,
+          assists: player.assists ?? 0,
+          yellowCards: player.yellowCards ?? 0,
+          redCards: player.redCards ?? 0,
+          matchesPlayed: player.matchesPlayed ?? 0,
+          isActive: player.isActive ?? true
+        });
+      });
+      console.log(`Initialized ${playersData.length} players from API`);
+    } catch (error) {
+      console.error('Failed to initialize players from API:', error);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -166,7 +146,8 @@ export class MemStorage implements IStorage {
   }
 
   async removePlayerFromTeam(userId: string, playerId: string): Promise<void> {
-    for (const [id, userTeam] of this.userTeams.entries()) {
+    const entries = Array.from(this.userTeams.entries());
+    for (const [id, userTeam] of entries) {
       if (userTeam.userId === userId && userTeam.playerId === playerId) {
         this.userTeams.delete(id);
         break;
@@ -217,36 +198,99 @@ export class MemStorage implements IStorage {
   async getPlayerRecommendations(userId: string): Promise<PlayerRecommendation[]> {
     const userTeam = await this.getUserTeam(userId);
     const ownedPlayerIds = new Set(userTeam.map(ut => ut.playerId));
+    const teamStats = await this.getUserTeamStats(userId);
     
     const allPlayers = Array.from(this.players.values()).filter(p => 
       p.isActive && !ownedPlayerIds.has(p.id)
     );
 
-    // Simple recommendation algorithm based on rating/price ratio
+    // Enhanced recommendation algorithm
     const recommendations = allPlayers
-      .map(player => ({
-        player,
-        valueScore: parseFloat(player.rating) / (player.price / 10),
-        reason: this.generateRecommendationReason(player),
-      }))
+      .map(player => {
+        const valueScore = this.calculateAdvancedValueScore(player, userTeam, teamStats);
+        return {
+          player,
+          valueScore,
+          reason: this.generateAdvancedRecommendationReason(player, userTeam),
+        };
+      })
       .sort((a, b) => b.valueScore - a.valueScore)
-      .slice(0, 5);
+      .slice(0, 8);
 
     return recommendations;
   }
 
-  private generateRecommendationReason(player: Player): string {
+  private calculateAdvancedValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
+    const rating = parseFloat(player.rating);
+    const efficiency = player.matchesPlayed > 0 ? (player.goals + player.assists) / player.matchesPlayed : 0;
+    const priceEfficiency = rating / (player.price / 10);
+    
+    // Position need analysis
+    const positionCounts = userTeam.reduce((acc, ut) => {
+      const p = this.players.get(ut.playerId);
+      if (p) {
+        acc[p.position] = (acc[p.position] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const positionNeed = this.getPositionNeedMultiplier(player.position, positionCounts);
+    
+    // Form factor (recent performance)
+    const formFactor = player.matchesPlayed >= 5 ? 1 + (efficiency * 0.3) : 0.8;
+    
+    return priceEfficiency * positionNeed * formFactor;
+  }
+
+  private getPositionNeedMultiplier(position: string, positionCounts: Record<string, number>): number {
+    const counts = {
+      P: positionCounts.P || 0,
+      D: positionCounts.D || 0,
+      C: positionCounts.C || 0,
+      A: positionCounts.A || 0,
+    };
+    
+    const needs = {
+      P: counts.P < 3 ? 1.5 : 0.8,
+      D: counts.D < 8 ? 1.3 : 0.9,
+      C: counts.C < 8 ? 1.3 : 0.9,
+      A: counts.A < 6 ? 1.2 : 0.9,
+    };
+    
+    return needs[position as keyof typeof needs] || 1.0;
+  }
+
+  private generateAdvancedRecommendationReason(player: Player, userTeam: UserTeam[]): string {
     const rating = parseFloat(player.rating);
     const efficiency = player.matchesPlayed > 0 ? (player.goals + player.assists) / player.matchesPlayed : 0;
     
+    // Position analysis
+    const positionCounts = userTeam.reduce((acc, ut) => {
+      const p = this.players.get(ut.playerId);
+      if (p) {
+        acc[p.position] = (acc[p.position] || 0) + 1;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const positionNames = { P: "portieri", D: "difensori", C: "centrocampisti", A: "attaccanti" };
+    const currentCount = positionCounts[player.position] || 0;
+    const minNeeded = { P: 3, D: 8, C: 8, A: 6 }[player.position] || 0;
+    
+    if (currentCount < minNeeded) {
+      return `Ruolo scoperto! Ti servono più ${positionNames[player.position as keyof typeof positionNames]}. Rating ${rating}, ${player.goals + player.assists} gol+assist.`;
+    }
+    
     if (rating >= 7.5 && efficiency >= 0.8) {
-      return `Eccellente rendimento: media voto ${rating}, ${player.goals} gol e ${player.assists} assist in ${player.matchesPlayed} partite.`;
-    } else if (rating >= 7.0) {
-      return `Buona media voto (${rating}) e titolare fisso. Ottimo rapporto qualità-prezzo.`;
-    } else if (player.price <= 20) {
-      return `Opzione economica con potenziale. Ideale per completare la rosa.`;
+      return `⭐ Top player: rating ${rating}, ${efficiency.toFixed(1)} gol+assist/partita. Investimento di qualità.`;
+    } else if (rating >= 7.0 && player.price <= 30) {
+      return `💎 Affare: rating ${rating} a solo €${player.price}. Ottimo rapporto qualità-prezzo.`;
+    } else if (player.price <= 15) {
+      return `🔥 Budget: opzione economica per completare la rosa. Rating ${rating}, prezzo accessibile.`;
+    } else if (efficiency >= 0.6) {
+      return `⚽ Produttivo: ${player.goals} gol e ${player.assists} assist in ${player.matchesPlayed} partite.`;
     } else {
-      return `Giocatore affidabile con esperienza in Serie A.`;
+      return `Giocatore affidabile con esperienza in Serie A. Rating ${rating}.`;
     }
   }
 
@@ -276,6 +320,94 @@ export class MemStorage implements IStorage {
         toTeam: "Al-Hilal",
         price: 40000000,
         timestamp: new Date(Date.now() - 8 * 60 * 1000),
+      },
+    ];
+  }
+
+  async refreshPlayersFromAPI(): Promise<void> {
+    try {
+      const playersData = await footballApi.refreshPlayerData();
+      
+      // Clear existing players and add fresh data
+      this.players.clear();
+      playersData.forEach(player => {
+        const id = randomUUID();
+        this.players.set(id, { 
+          ...player, 
+          id,
+          goals: player.goals ?? 0,
+          assists: player.assists ?? 0,
+          yellowCards: player.yellowCards ?? 0,
+          redCards: player.redCards ?? 0,
+          matchesPlayed: player.matchesPlayed ?? 0,
+          isActive: player.isActive ?? true
+        });
+      });
+      console.log(`Refreshed ${playersData.length} players from API`);
+    } catch (error) {
+      console.error('Failed to refresh players from API:', error);
+    }
+  }
+
+  async getFormations(userId: string): Promise<Formation[]> {
+    // Mock formations for demo
+    return [
+      {
+        id: "formation-1",
+        userId,
+        name: "Formazione Principale",
+        formation: "3-5-2",
+        playerIds: [],
+        isActive: true,
+        createdAt: new Date(),
+      },
+    ];
+  }
+
+  async saveFormation(userId: string, formationData: Omit<Formation, 'id' | 'userId' | 'createdAt'>): Promise<Formation> {
+    const formation: Formation = {
+      id: Date.now().toString(),
+      userId,
+      ...formationData,
+      createdAt: new Date(),
+    };
+    
+    console.log("Formation saved:", formation);
+    return formation;
+  }
+
+  async getLeagueStandings(): Promise<LeagueStanding[]> {
+    // Mock league standings
+    return [
+      {
+        position: 1,
+        userId: "user1",
+        username: "FantaExpert",
+        totalPoints: 125,
+        matchesPlayed: 5,
+        wins: 4,
+        draws: 1,
+        losses: 0,
+      },
+      {
+        position: 2,
+        userId: "user2", 
+        username: "SerieAFan",
+        totalPoints: 118,
+        matchesPlayed: 5,
+        wins: 3,
+        draws: 2,
+        losses: 0,
+      },
+      {
+        position: 3,
+        userId: "user3",
+        username: "CalcioMaster",
+        totalPoints: 112,
+        matchesPlayed: 5,
+        wins: 3,
+        draws: 1,
+        losses: 1,
       },
     ];
   }

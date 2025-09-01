@@ -7,6 +7,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 import Dashboard from "@/pages/dashboard";
 import Roster from "@/pages/roster";
 import Market from "@/pages/market";
+import Stats from "@/pages/stats";
+import Simulation from "@/pages/simulation";
 import Login from "@/pages/login";
 import NotFound from "@/pages/not-found";
 
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/" component={Dashboard} />
       <Route path="/roster" component={Roster} />
       <Route path="/market" component={Market} />
+      <Route path="/stats" component={Stats} />
+      <Route path="/simulation" component={Simulation} />
       <Route path="/login" component={Login} />
       <Route component={NotFound} />
     </Switch>

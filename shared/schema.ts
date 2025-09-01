@@ -99,3 +99,34 @@ export type MarketActivity = {
   price: number;
   timestamp: Date;
 };
+
+export type Formation = {
+  id: string;
+  userId: string;
+  name: string;
+  formation: string; // e.g., "3-5-2", "4-4-2"
+  playerIds: string[];
+  isActive: boolean;
+  createdAt: Date;
+};
+
+export type MatchSimulation = {
+  id: string;
+  userId: string;
+  opponentTeam: string;
+  userScore: number;
+  opponentScore: number;
+  fantasyPoints: number;
+  matchDate: Date;
+};
+
+export type LeagueStanding = {
+  position: number;
+  userId: string;
+  username: string;
+  totalPoints: number;
+  matchesPlayed: number;
+  wins: number;
+  draws: number;
+  losses: number;
+};

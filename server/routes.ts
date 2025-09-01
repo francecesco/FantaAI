@@ -207,6 +207,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route to refresh player data from API
+  app.post("/api/admin/refresh-players", async (req, res) => {
+    try {
+      await storage.refreshPlayersFromAPI();
+      res.json({ message: "Player data refreshed successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to refresh player data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

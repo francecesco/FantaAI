@@ -76,6 +76,16 @@ export default function Dashboard() {
   }
 
   const handleAddRecommendation = (recommendation: PlayerRecommendation) => {
+    // Check if user has enough credits
+    if (!teamStats || teamStats.remainingCredits < recommendation.player.price) {
+      toast({
+        title: "Crediti insufficienti",
+        description: `Ti servono €${recommendation.player.price} ma hai solo €${teamStats?.remainingCredits || 0}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     addPlayerMutation.mutate({
       playerId: recommendation.player.id,
       price: recommendation.player.price,
