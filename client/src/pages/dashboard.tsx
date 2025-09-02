@@ -246,157 +246,154 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        {/* Layout Lineare - Tutto in colonna */}
+        <div className="space-y-8">
+          
           {/* Team Roster */}
-          <div className="xl:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>La Mia Rosa</CardTitle>
-                <CardDescription>I tuoi giocatori divisi per ruolo</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {userTeam.length === 0 ? (
-                  <div className="text-center py-8" data-testid="empty-roster">
-                    <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Nessun giocatore in rosa</p>
-                    <Button 
-                      className="mt-4" 
-                      onClick={() => setLocation("/market")}
-                      data-testid="button-go-to-market"
-                    >
-                      Vai al Mercato
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {Object.entries(positionNames).map(([position, name]) => {
-                      const players = playersByPosition[position] || [];
-                      if (players.length === 0) return null;
-                      
-                      return (
-                        <div key={position}>
-                          <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                            {name} ({players.length})
-                          </h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {players.slice(0, 3).map((userTeam) => (
-                              <PlayerCard
-                                key={userTeam.id}
-                                player={userTeam.player}
-                                purchasePrice={userTeam.purchasePrice}
-                                showStats={true}
-                              />
-                            ))}
-                          </div>
-                          {players.length > 3 && (
-                            <div className="mt-3 text-center">
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => setLocation("/roster")}
-                                data-testid={`button-show-more-${position}`}
-                              >
-                                Mostra tutti i {name.toLowerCase()} ({players.length - 3} rimanenti)
-                              </Button>
-                            </div>
-                          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>La Mia Rosa</CardTitle>
+              <CardDescription>I tuoi giocatori divisi per ruolo</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {userTeam.length === 0 ? (
+                <div className="text-center py-8" data-testid="empty-roster">
+                  <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Nessun giocatore in rosa</p>
+                  <Button 
+                    className="mt-4" 
+                    onClick={() => setLocation("/market")}
+                    data-testid="button-go-to-market"
+                  >
+                    Vai al Mercato
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {Object.entries(positionNames).map(([position, name]) => {
+                    const players = playersByPosition[position] || [];
+                    if (players.length === 0) return null;
+                    
+                    return (
+                      <div key={position}>
+                        <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                          {name} ({players.length})
+                        </h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                          {players.slice(0, 4).map((userTeam) => (
+                            <PlayerCard
+                              key={userTeam.id}
+                              player={userTeam.player}
+                              purchasePrice={userTeam.purchasePrice}
+                              showStats={true}
+                            />
+                          ))}
                         </div>
-                      );
-                    })}
+                        {players.length > 4 && (
+                          <div className="mt-3 text-center">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setLocation("/roster")}
+                              data-testid={`button-show-more-${position}`}
+                            >
+                              Mostra tutti i {name.toLowerCase()} ({players.length - 4} rimanenti)
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Player Recommendations */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg">🤖 Consigli AI per Principianti</CardTitle>
+                <span className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full font-medium">
+                  Intelligenza Artificiale
+                </span>
+              </div>
+              <CardDescription>
+                L'AI analizza tutti i giocatori e ti consiglia i migliori per la tua squadra
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recommendations.slice(0, 3).map((recommendation) => (
+                  <RecommendationCard
+                    key={recommendation.player.id}
+                    recommendation={recommendation}
+                    onAddPlayer={handleAddRecommendation}
+                  />
+                ))}
+                {recommendations.length === 0 && (
+                  <div className="text-center py-6" data-testid="no-recommendations">
+                    <p className="text-muted-foreground mb-2">Nessun consiglio disponibile</p>
+                    <p className="text-xs text-muted-foreground">Aggiungi alcuni giocatori per ricevere consigli personalizzati</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+                {recommendations.length > 0 && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => setLocation("/market")}
+                    data-testid="button-see-all-recommendations"
+                  >
+                    Vedi Tutti i Consigli nel Mercato
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Sidebar */}
-          <div className="space-y-8">
-            {/* Player Recommendations */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">🤖 Consigli AI per Principianti</CardTitle>
-                  <span className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full font-medium">
-                    Intelligenza Artificiale
-                  </span>
+          {/* Consigli Tattici */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">⚽ Consigli Tattici</CardTitle>
+              <CardDescription>
+                Strategie per massimizzare i punti della tua squadra
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                    🏆 Formazione 3-5-2 (Consigliata)
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    La formazione più equilibrata: 3 difensori, 5 centrocampisti, 2 attaccanti. 
+                    Perfetta per principianti perché i centrocampisti prendono voti più stabili.
+                  </p>
                 </div>
-                <CardDescription>
-                  L'AI analizza tutti i giocatori e ti consiglia i migliori per la tua squadra
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recommendations.slice(0, 3).map((recommendation) => (
-                    <RecommendationCard
-                      key={recommendation.player.id}
-                      recommendation={recommendation}
-                      onAddPlayer={handleAddRecommendation}
-                    />
-                  ))}
-                  {recommendations.length === 0 && (
-                    <div className="text-center py-6" data-testid="no-recommendations">
-                      <p className="text-muted-foreground mb-2">Nessun consiglio disponibile</p>
-                      <p className="text-xs text-muted-foreground">Aggiungi alcuni giocatori per ricevere consigli personalizzati</p>
-                    </div>
-                  )}
-                  {recommendations.length > 0 && (
-                    <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => setLocation("/market")}
-                      data-testid="button-see-all-recommendations"
-                    >
-                      Vedi Tutti i Consigli nel Mercato
-                    </Button>
-                  )}
+                
+                <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
+                    💰 Gestione Budget
+                  </h4>
+                  <p className="text-sm text-green-700 dark:text-green-300">
+                    Regola d'oro: spendi 200-250FM per 2-3 campioni, poi completa con giocatori da 5-15FM. 
+                    Non comprare solo stelle costose!
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
+                    🎯 Priorità Acquisti
+                  </h4>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                    1° Portiere titolare forte, 2° Attaccanti che segnano sempre, 
+                    3° Centrocampisti jolly, 4° Difensori delle big.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Consigli Tattici */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">⚽ Consigli Tattici</CardTitle>
-                <CardDescription>
-                  Strategie per massimizzare i punti della tua squadra
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                    <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                      🏆 Formazione 3-5-2 (Consigliata)
-                    </h4>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      La formazione più equilibrata: 3 difensori, 5 centrocampisti, 2 attaccanti. 
-                      Perfetta per principianti perché i centrocampisti prendono voti più stabili.
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                    <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2">
-                      💰 Gestione Budget
-                    </h4>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Regola d'oro: spendi 200-250FM per 2-3 campioni, poi completa con giocatori da 5-15FM. 
-                      Non comprare solo stelle costose!
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                    <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-                      🎯 Priorità Acquisti
-                    </h4>
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                      1° Portiere titolare forte, 2° Attaccanti che segnano sempre, 
-                      3° Centrocampisti jolly, 4° Difensori delle big.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-          </div>
         </div>
       </main>
 
