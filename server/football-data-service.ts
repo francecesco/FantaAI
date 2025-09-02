@@ -141,18 +141,19 @@ export class FootballDataService {
       throw new Error('❌ FOOTBALL_DATA_API_KEY non configurata. Configura la chiave API per utilizzare dati reali.');
     }
 
-    // Prova prima a leggere dalla cache persistente
-    const cachedPlayers = await this.getCachedPlayers();
-    if (cachedPlayers.length > 0) {
-      return cachedPlayers;
-    }
-    
-    // Controlla se il database è già popolato
+    // Controlla prima se il database è già popolato
+    console.log('🔍 Controllo database per giocatori esistenti...');
     const dbPlayers = await this.getPlayersFromDatabase();
     if (dbPlayers.length > 0) {
       console.log(`📦 Database già popolato con ${dbPlayers.length} giocatori, salvataggio in cache...`);
       await this.saveCache(dbPlayers);
       return dbPlayers;
+    }
+
+    // Prova a leggere dalla cache persistente
+    const cachedPlayers = await this.getCachedPlayers();
+    if (cachedPlayers.length > 0) {
+      return cachedPlayers;
     }
     
     console.log('🔄 Cache vuota e database vuoto, ricaricamento da API...');

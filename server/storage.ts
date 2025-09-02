@@ -76,10 +76,20 @@ export class DatabaseStorage implements IStorage {
 
   private async initializePlayers() {
     try {
+      // Attendi un momento per assicurarsi che il database sia pronto
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       // Check if players already exist
       const existingPlayers = await db.select().from(players).limit(1);
       if (existingPlayers.length > 0) {
         console.log(`✅ Database già popolato con giocatori esistenti (${existingPlayers.length} trovati)`);
+        return;
+      }
+
+      // Controlla anche il conteggio totale per essere sicuri
+      const totalPlayers = await db.select().from(players);
+      if (totalPlayers.length > 0) {
+        console.log(`✅ Database già popolato con ${totalPlayers.length} giocatori totali`);
         return;
       }
 
