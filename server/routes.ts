@@ -206,6 +206,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Match formations route - public (formazioni partite)
+  app.get("/api/matches/:matchId/formations", async (req, res) => {
+    try {
+      const { matchId } = req.params;
+      const formations = await storage.getMatchFormations(matchId);
+      res.json(formations);
+    } catch (error) {
+      console.error("Error fetching match formations:", error);
+      res.status(500).json({ message: "Failed to fetch match formations" });
+    }
+  });
+
   // Admin route to refresh player data
   app.post("/api/admin/refresh-players", async (req, res) => {
     try {

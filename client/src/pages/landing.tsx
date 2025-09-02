@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Users, TrendingUp, Target, Play } from "lucide-react";
+import { Trophy, Users, TrendingUp, Target, Play, Calendar } from "lucide-react";
 
 export default function Landing() {
   return (
@@ -100,11 +100,11 @@ export default function Landing() {
           <Card className="text-center">
             <CardHeader>
               <div className="w-12 h-12 bg-chart-3/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Play className="w-6 h-6 text-chart-3" />
+                <Calendar className="w-6 h-6 text-chart-3" />
               </div>
-              <CardTitle>Simulazione</CardTitle>
+              <CardTitle>Calendario</CardTitle>
               <CardDescription>
-                Testa la tua squadra con partite simulate
+                Segui tutte le partite della Serie A 2025/26
               </CardDescription>
             </CardHeader>
           </Card>

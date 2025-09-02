@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Clock, Trophy, MapPin } from "lucide-react";
+import { FormationViewer } from "@/components/formation-viewer";
 import type { Match } from "@shared/schema";
 
 export default function Calendar() {
@@ -180,6 +181,13 @@ export default function Calendar() {
                           {getStatusBadge(match.status)}
                         </div>
                       </div>
+                      
+                      {/* Formations */}
+                      <FormationViewer
+                        matchId={match.fantacalcioId}
+                        homeTeam={match.homeTeam}
+                        awayTeam={match.awayTeam}
+                      />
                     </div>
                   ))}
                 </div>

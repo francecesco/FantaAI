@@ -65,6 +65,7 @@ export interface IStorage {
 
   // Calendar operations
   getSerieACalendar(): Promise<Match[]>;
+  getMatchFormations(matchId: string): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -606,6 +607,47 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
   }
+
+  async getMatchFormations(matchId: string): Promise<any> {
+    // Simula formazioni per le partite
+    // In una implementazione reale, questi dati verrebbero da un'API esterna
+    const formations = {
+      home: {
+        formation: "4-3-3",
+        players: [
+          { position: "GK", name: "Portiere", number: 1 },
+          { position: "DEF", name: "Terzino Dx", number: 2 },
+          { position: "DEF", name: "Difensore Cx", number: 3 },
+          { position: "DEF", name: "Difensore Cx", number: 4 },
+          { position: "DEF", name: "Terzino Sx", number: 5 },
+          { position: "MID", name: "Centrocampista", number: 6 },
+          { position: "MID", name: "Centrocampista", number: 7 },
+          { position: "MID", name: "Centrocampista", number: 8 },
+          { position: "ATT", name: "Ala Dx", number: 9 },
+          { position: "ATT", name: "Attaccante", number: 10 },
+          { position: "ATT", name: "Ala Sx", number: 11 },
+        ]
+      },
+      away: {
+        formation: "3-5-2",
+        players: [
+          { position: "GK", name: "Portiere", number: 1 },
+          { position: "DEF", name: "Difensore", number: 2 },
+          { position: "DEF", name: "Difensore", number: 3 },
+          { position: "DEF", name: "Difensore", number: 4 },
+          { position: "MID", name: "Centrocampista", number: 5 },
+          { position: "MID", name: "Centrocampista", number: 6 },
+          { position: "MID", name: "Centrocampista", number: 7 },
+          { position: "MID", name: "Centrocampista", number: 8 },
+          { position: "MID", name: "Centrocampista", number: 9 },
+          { position: "ATT", name: "Attaccante", number: 10 },
+          { position: "ATT", name: "Attaccante", number: 11 },
+        ]
+      }
+    };
+
+    return formations;
+  }
 }
 
 // MemStorage implementation for when database is offline
@@ -975,6 +1017,47 @@ export class MemStorage implements IStorage {
       }));
     }
     return this.calendarData.sort((a, b) => a.round - b.round || a.date.getTime() - b.date.getTime());
+  }
+
+  async getMatchFormations(matchId: string): Promise<any> {
+    // Simula formazioni per le partite
+    // In una implementazione reale, questi dati verrebbero da un'API esterna
+    const formations = {
+      home: {
+        formation: "4-3-3",
+        players: [
+          { position: "GK", name: "Portiere", number: 1 },
+          { position: "DEF", name: "Terzino Dx", number: 2 },
+          { position: "DEF", name: "Difensore Cx", number: 3 },
+          { position: "DEF", name: "Difensore Cx", number: 4 },
+          { position: "DEF", name: "Terzino Sx", number: 5 },
+          { position: "MID", name: "Centrocampista", number: 6 },
+          { position: "MID", name: "Centrocampista", number: 7 },
+          { position: "MID", name: "Centrocampista", number: 8 },
+          { position: "ATT", name: "Ala Dx", number: 9 },
+          { position: "ATT", name: "Attaccante", number: 10 },
+          { position: "ATT", name: "Ala Sx", number: 11 },
+        ]
+      },
+      away: {
+        formation: "3-5-2",
+        players: [
+          { position: "GK", name: "Portiere", number: 1 },
+          { position: "DEF", name: "Difensore", number: 2 },
+          { position: "DEF", name: "Difensore", number: 3 },
+          { position: "DEF", name: "Difensore", number: 4 },
+          { position: "MID", name: "Centrocampista", number: 5 },
+          { position: "MID", name: "Centrocampista", number: 6 },
+          { position: "MID", name: "Centrocampista", number: 7 },
+          { position: "MID", name: "Centrocampista", number: 8 },
+          { position: "MID", name: "Centrocampista", number: 9 },
+          { position: "ATT", name: "Attaccante", number: 10 },
+          { position: "ATT", name: "Attaccante", number: 11 },
+        ]
+      }
+    };
+
+    return formations;
   }
 }
 

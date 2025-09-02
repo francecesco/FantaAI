@@ -9,7 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Roster from "@/pages/roster";
 import Market from "@/pages/market";
 import Stats from "@/pages/stats";
-import Simulation from "@/pages/simulation";
+
 import Calendar from "@/pages/calendar";
 import Landing from "@/pages/landing";
 import Login from "@/pages/login";
@@ -45,7 +45,7 @@ function Router() {
           <Route path="/market" component={Market} />
           <Route path="/stats" component={Stats} />
           <Route path="/calendar" component={Calendar} />
-          <Route path="/simulation" component={Simulation} />
+
         </>
       )}
       <Route component={NotFound} />

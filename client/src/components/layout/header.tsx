@@ -62,7 +62,7 @@ export function Header() {
     { name: "Rosa", href: "/roster", active: location === "/roster" },
     { name: "Mercato", href: "/market", active: location === "/market" },
     { name: "Statistiche", href: "/stats", active: location === "/stats" },
-    { name: "Simula", href: "/simulation", active: location === "/simulation" },
+    { name: "Calendario", href: "/calendar", active: location === "/calendar" },
   ];
 
   return (
