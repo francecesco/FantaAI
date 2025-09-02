@@ -21,6 +21,7 @@ init_database() {
     
     # Controlla se il database esiste
     echo "🔍 Controllo esistenza database..."
+    export PGPASSWORD=$POSTGRES_PASSWORD
     if psql -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw $POSTGRES_DB; then
         echo "✅ Database già esistente"
     else
