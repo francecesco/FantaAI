@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     ports:
-      - "5432:5432"
+      - "5433:5432"
     networks:
       - fantai-network
     healthcheck:
@@ -37,9 +37,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: fantaseriea
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/fantaseriea
+      SESSION_SECRET: your-super-secret-session-key-change-this-in-production
       NODE_ENV: production
     ports:
-      - "3000:3000"
+      - "3000:5000"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads

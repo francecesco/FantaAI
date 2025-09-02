@@ -20,8 +20,8 @@ COPY tailwind.config.ts ./
 COPY postcss.config.js ./
 COPY components.json ./
 
-# Installa le dipendenze
-RUN npm ci --only=production
+# Installa le dipendenze (incluso drizzle-kit per db:push)
+RUN npm ci
 
 # Copia il codice sorgente
 COPY . .

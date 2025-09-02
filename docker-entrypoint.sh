@@ -23,7 +23,8 @@ init_database() {
     createdb -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_DB 2>/dev/null || echo "Database già esistente"
     
     # Sincronizza lo schema
-    npm run db:push
+    echo "🔄 Sincronizzazione schema database..."
+    timeout 30s npm run db:push || echo "⚠️  Timeout durante db:push, continuo..."
     
     # Verifica se ci sono giocatori nel database
     PLAYER_COUNT=$(psql -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER -d $POSTGRES_DB -t -c "SELECT COUNT(*) FROM players;" 2>/dev/null | tr -d ' ')
@@ -48,7 +49,7 @@ start_server() {
     
     # Attendi che il server sia pronto
     echo "⏳ Attendo che il server sia pronto..."
-    until curl -s http://localhost:3000/api/health > /dev/null 2>&1; do
+    until curl -s http://localhost:5000/api/health > /dev/null 2>&1; do
         echo "Server non è ancora pronto, attendo..."
         sleep 2
     done
@@ -105,12 +106,10 @@ echo "   Host: $POSTGRES_HOST"
 echo "   Porta: $POSTGRES_PORT"
 echo "   Database: $POSTGRES_DB"
 echo "   Utente: $POSTGRES_USER"
+echo "   DATABASE_URL: $DATABASE_URL"
 
 # Attendi PostgreSQL
 wait_for_postgres
 
-# Inizializza il database
-init_database
-
-# Avvia il server
+# Avvia il server direttamente (l'inizializzazione avverrà automaticamente)
 start_server
