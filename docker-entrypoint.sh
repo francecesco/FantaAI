@@ -30,12 +30,12 @@ init_database() {
     PLAYER_COUNT=$(psql -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER -d $POSTGRES_DB -t -c "SELECT COUNT(*) FROM players;" 2>/dev/null | tr -d ' ')
     
     if [ "$PLAYER_COUNT" = "0" ] || [ -z "$PLAYER_COUNT" ]; then
-        echo "📊 Caricamento dati giocatori..."
+        echo "📊 Database vuoto, caricamento dati giocatori..."
         # Avvia il server temporaneamente per caricare i dati
         timeout 30s npm run dev > /dev/null 2>&1 || true
         echo "✅ Dati giocatori caricati!"
     else
-        echo "✅ Database già popolato con $PLAYER_COUNT giocatori"
+        echo "✅ Database già popolato con $PLAYER_COUNT giocatori - nessun refresh necessario"
     fi
 }
 

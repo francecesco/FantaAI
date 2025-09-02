@@ -79,10 +79,12 @@ export class DatabaseStorage implements IStorage {
       // Check if players already exist
       const existingPlayers = await db.select().from(players).limit(1);
       if (existingPlayers.length > 0) {
-        console.log("Players already exist in database");
+        console.log(`✅ Database già popolato con giocatori esistenti (${existingPlayers.length} trovati)`);
         return;
       }
 
+      console.log("📊 Database vuoto, inizializzazione giocatori...");
+      
       // Initialize with API data
       const playersData = await footballDataService.getSerieAPlayers();
       
@@ -103,9 +105,9 @@ export class DatabaseStorage implements IStorage {
         });
       }
       
-      console.log(`Initialized ${playersData.length} players in database`);
+      console.log(`✅ Inizializzati ${playersData.length} giocatori nel database`);
     } catch (error) {
-      console.error('Error initializing players:', error);
+      console.error('❌ Errore durante inizializzazione giocatori:', error);
     }
   }
 
