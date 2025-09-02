@@ -147,7 +147,15 @@ export class FootballDataService {
       return cachedPlayers;
     }
     
-    console.log('🔄 Cache vuota o scaduta, ricaricamento da API...');
+    // Controlla se il database è già popolato
+    const dbPlayers = await this.getPlayersFromDatabase();
+    if (dbPlayers.length > 0) {
+      console.log(`📦 Database già popolato con ${dbPlayers.length} giocatori, salvataggio in cache...`);
+      await this.saveCache(dbPlayers);
+      return dbPlayers;
+    }
+    
+    console.log('🔄 Cache vuota e database vuoto, ricaricamento da API...');
     // Svuota anche la cache in memoria per forzare il ricaricamento
     this.clearCache();
 
@@ -324,6 +332,36 @@ export class FootballDataService {
   private async saveCache(players: InsertPlayer[]): Promise<void> {
     await cacheService.set('players', players, 25); // 25 ore per sicurezza
     console.log(`💾 Cache persistente salvata: ${players.length} giocatori`);
+  }
+
+  private async getPlayersFromDatabase(): Promise<InsertPlayer[]> {
+    try {
+      const { db } = await import('./db');
+      const { players } = await import('@shared/schema');
+      
+      const dbPlayers = await db.select().from(players).limit(1);
+      if (dbPlayers.length === 0) {
+        return [];
+      }
+      
+      // Se ci sono giocatori nel database, li convertiamo nel formato InsertPlayer
+      const allPlayers = await db.select().from(players);
+      return allPlayers.map(player => ({
+        name: player.name,
+        position: player.position,
+        team: player.team,
+        price: player.price,
+        rating: parseFloat(player.rating),
+        goals: player.goals || 0,
+        assists: player.assists || 0,
+        yellowCards: player.yellowCards || 0,
+        redCards: player.redCards || 0,
+        matchesPlayed: player.matchesPlayed || 0
+      }));
+    } catch (error) {
+      console.error('❌ Errore lettura database:', error);
+      return [];
+    }
   }
 
   async getSerieACalendar(): Promise<InsertMatch[]> {
