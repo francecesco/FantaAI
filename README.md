@@ -48,6 +48,23 @@ Per abilitare i consigli AI avanzati:
    ```
 3. **Riavvia l'applicazione**
 
+### ⚽ Configurazione Dati Reali
+Per utilizzare dati reali della Serie A 2025/26:
+
+1. **Football-Data.org (OBBLIGATORIO)**:
+   - Ottieni API Key: https://www.football-data.org/
+   - Configura: `FOOTBALL_DATA_API_KEY=your-key-here`
+
+2. **API-Football (OPZIONALE per statistiche dettagliate)**:
+   - Ottieni API Key: https://rapidapi.com/api-sports/api/api-football
+   - Configura: `API_FOOTBALL_KEY=your-key-here`
+
+### 🚀 Funzionalità Avanzate
+- **Cache Persistente**: Dati sempre pronti, refresh automatico ogni notte a mezzanotte
+- **Prezzo Personalizzato**: Acquisto giocatori con prezzo custom durante aste
+- **Calendario Completo**: 380 partite Serie A 2025/26 con punteggi reali
+- **Statistiche Reali**: 641 giocatori con statistiche aggiornate
+
 > **Nota**: Senza API Key, l'applicazione userà algoritmi tradizionali per le raccomandazioni.
 
 ### ⚽ Configurazione Dati Calcio

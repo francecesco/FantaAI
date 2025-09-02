@@ -29,6 +29,11 @@
       "name": "postgres_data",
       "path": "/var/lib/postgresql/data",
       "description": "Dati persistenti del database PostgreSQL"
+    },
+    {
+      "name": "cache_data",
+      "path": "/app/server/cache",
+      "description": "Cache persistente per giocatori e calendario"
     }
   ],
   "environment": [
@@ -132,6 +137,9 @@
       "ports": [
         "3000:5001"
       ],
+      "volumes": [
+        "cache_data:/app/server/cache"
+      ],
       "depends_on": [
         "postgres"
       ],
@@ -150,6 +158,9 @@
   ],
   "volumes": {
     "postgres_data": {
+      "driver": "local"
+    },
+    "cache_data": {
       "driver": "local"
     }
   },

@@ -21,6 +21,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
       - "3000:5001"
+    volumes:
+      - ./server/cache:/app/server/cache
     depends_on:
       postgres:
         condition: service_healthy

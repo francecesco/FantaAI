@@ -51,6 +51,7 @@ services:
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
+      - ./server/cache:/app/server/cache
     networks:
       - fantai-network
     healthcheck:
