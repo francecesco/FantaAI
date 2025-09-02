@@ -6,25 +6,30 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search } from "lucide-react";
 import { PlayerCard } from "./player-card";
+import { PurchaseModal } from "./purchase-modal";
 import type { Player } from "@shared/schema";
 
 interface PlayerSearchProps {
-  onPlayerSelect?: (player: Player) => void;
+  onPlayerSelect?: (player: Player, customPrice?: number) => void;
   excludePlayerIds?: string[];
   actionLabel?: string;
   actionVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  userCredits?: number;
 }
 
 export function PlayerSearch({ 
   onPlayerSelect, 
   excludePlayerIds = [],
   actionLabel = "Acquista",
-  actionVariant = "default"
+  actionVariant = "default",
+  userCredits = 0
 }: PlayerSearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [position, setPosition] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [visiblePlayers, setVisiblePlayers] = useState(12);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
 
   const { data: players = [], isLoading } = useQuery<Player[]>({
     queryKey: ["/api/players", { 
@@ -39,6 +44,17 @@ export function PlayerSearch({
 
   const handleLoadMore = () => {
     setVisiblePlayers(prev => prev + 12);
+  };
+
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsPurchaseModalOpen(true);
+  };
+
+  const handlePurchaseConfirm = (player: Player, customPrice: number) => {
+    if (onPlayerSelect) {
+      onPlayerSelect(player, customPrice);
+    }
   };
 
   // Reset visible players when filters change
@@ -115,7 +131,7 @@ export function PlayerSearch({
               <PlayerCard
                 key={player.id}
                 player={player}
-                onAction={onPlayerSelect}
+                onAction={handlePlayerClick}
                 actionLabel={actionLabel}
                 actionVariant={actionVariant}
                 showStats={true}
@@ -136,6 +152,15 @@ export function PlayerSearch({
           </div>
         )}
       </CardContent>
+
+      {/* Purchase Modal */}
+      <PurchaseModal
+        player={selectedPlayer}
+        isOpen={isPurchaseModalOpen}
+        onClose={() => setIsPurchaseModalOpen(false)}
+        onConfirm={handlePurchaseConfirm}
+        userCredits={userCredits}
+      />
     </Card>
   );
 }

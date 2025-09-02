@@ -33,10 +33,10 @@ export default function Market() {
   });
 
   const addPlayerMutation = useMutation({
-    mutationFn: async (player: Player) => {
+    mutationFn: async ({ player, customPrice }: { player: Player; customPrice?: number }) => {
       const response = await apiRequest("POST", `/api/team/${user?.id}/players`, {
         playerId: player.id,
-        purchasePrice: player.price,
+        purchasePrice: customPrice || player.price,
       });
       return response.json();
     },
@@ -61,12 +61,14 @@ export default function Market() {
     return null;
   }
 
-  const handlePlayerSelect = (player: Player) => {
+  const handlePlayerSelect = (player: Player, customPrice?: number) => {
+    const purchasePrice = customPrice || player.price;
+    
     // Check if user has enough credits
-    if (!teamStats || teamStats.remainingCredits < player.price) {
+    if (!teamStats || teamStats.remainingCredits < purchasePrice) {
       toast({
         title: "Crediti insufficienti",
-        description: `Ti servono ${player.price}FM ma hai solo ${teamStats?.remainingCredits || 0}FM`,
+        description: `Ti servono ${purchasePrice}FM ma hai solo ${teamStats?.remainingCredits || 0}FM`,
         variant: "destructive",
       });
       return;
@@ -83,7 +85,7 @@ export default function Market() {
       return;
     }
 
-    addPlayerMutation.mutate(player);
+    addPlayerMutation.mutate({ player, customPrice });
   };
 
   const ownedPlayerIds = userTeam.map(ut => ut.player.id);
@@ -142,12 +144,13 @@ export default function Market() {
           </Card>
 
           {/* Player Search */}
-          <PlayerSearch
-            onPlayerSelect={handlePlayerSelect}
-            excludePlayerIds={ownedPlayerIds}
-            actionLabel="Acquista"
-            actionVariant="default"
-          />
+                  <PlayerSearch
+          onPlayerSelect={handlePlayerSelect}
+          excludePlayerIds={ownedPlayerIds}
+          actionLabel="Acquista"
+          actionVariant="default"
+          userCredits={teamStats?.remainingCredits || 0}
+        />
         </div>
       </main>
 
