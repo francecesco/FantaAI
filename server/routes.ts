@@ -218,6 +218,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Team Analysis endpoint
+  app.get("/api/team/:userId/ai-analysis", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const userTeam = await storage.getUserTeam(userId);
+      const teamStats = await storage.getUserTeamStats(userId);
+      const allPlayers = await storage.getAllPlayers();
+      
+      const aiAnalysis = await storage.getAITeamAnalysis(userTeam, teamStats, allPlayers);
+      res.json(aiAnalysis);
+    } catch (error) {
+      console.error("Error fetching AI team analysis:", error);
+      res.status(500).json({ message: "Failed to fetch AI team analysis" });
+    }
+  });
+
   // Admin route to refresh player data
   app.post("/api/admin/refresh-players", async (req, res) => {
     try {

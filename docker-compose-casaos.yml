@@ -13,8 +13,12 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/fantaseriea
       SESSION_SECRET: your-super-secret-session-key-change-this-in-production
       NODE_ENV: production
+      # Football Data API
+      FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY}
+      # AI Configuration
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
-      - "3000:5000"
+      - "3000:5001"
     depends_on:
       postgres:
         condition: service_healthy
@@ -22,7 +26,7 @@ services:
       - fantai_network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3

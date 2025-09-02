@@ -33,7 +33,13 @@
    DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fantaseriea
    SESSION_SECRET=your-super-secret-session-key-change-this-in-production
    NODE_ENV=production
+   FOOTBALL_DATA_API_KEY=your-football-data-api-key-here
+   GEMINI_API_KEY=your-gemini-api-key-here
    ```
+   
+   **⚠️ IMPORTANTE**: Le chiavi API sono **OBBLIGATORIE**:
+   - `FOOTBALL_DATA_API_KEY`: Ottieni da https://www.football-data.org/
+   - `GEMINI_API_KEY`: Ottieni da https://aistudio.google.com/
 
 6. **Configura le porte:**
    - **3000** → Accesso all'applicazione
@@ -109,6 +115,21 @@ docker exec fantai-postgres pg_dump -U postgres fantaseriea > backup_$(date +%Y%
 docker exec -i fantai-postgres psql -U postgres fantaseriea < backup_file.sql
 ```
 
+## 🔑 **CONFIGURAZIONE API KEYS**
+
+### **Football-Data.org API Key:**
+1. Vai su https://www.football-data.org/
+2. Registrati gratuitamente
+3. Ottieni la chiave API (10 richieste/minuto, 100/giorno)
+4. Aggiungi `FOOTBALL_DATA_API_KEY=your-key-here` nelle variabili d'ambiente
+
+### **Google Gemini API Key:**
+1. Vai su https://aistudio.google.com/
+2. Accedi con il tuo account Google
+3. Crea un nuovo progetto
+4. Ottieni la chiave API
+5. Aggiungi `GEMINI_API_KEY=your-key-here` nelle variabili d'ambiente
+
 ## 🛠️ **CONFIGURAZIONE AVANZATA**
 
 ### **Variabili d'ambiente personalizzate:**
@@ -117,6 +138,7 @@ Modifica il file `docker-compose-casaos.yml` per personalizzare:
 - Secret session
 - Porte di accesso
 - Risorse (CPU/RAM)
+- API Keys
 
 ### **Volumi persistenti:**
 I dati del database sono salvati nel volume `postgres_data` e persistono tra i riavvii.
@@ -139,7 +161,17 @@ I dati del database sono salvati nel volume `postgres_data` e persistono tra i r
    ```bash
    # Cambia la porta nel docker-compose-casaos.yml
    ports:
-     - "3001:5000"  # Usa porta 3001 invece di 3000
+     - "3001:5001"  # Usa porta 3001 invece di 3000
+   ```
+
+4. **API Keys non configurate:**
+   ```bash
+   # Verifica le variabili d'ambiente
+   docker-compose -f docker-compose-casaos.yml logs fantai | grep "API_KEY"
+   
+   # L'applicazione mostrerà errori se le chiavi non sono configurate:
+   # "❌ FOOTBALL_DATA_API_KEY non configurata"
+   # "❌ GEMINI_API_KEY non configurata"
    ```
 
 4. **Permessi file:**

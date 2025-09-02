@@ -71,6 +71,16 @@
       "name": "NODE_ENV",
       "value": "production",
       "description": "Ambiente di esecuzione Node.js"
+    },
+    {
+      "name": "FOOTBALL_DATA_API_KEY",
+      "value": "",
+      "description": "Chiave API per Football-Data.org (obbligatoria per dati reali)"
+    },
+    {
+      "name": "GEMINI_API_KEY",
+      "value": "",
+      "description": "Chiave API per Google Gemini AI (obbligatoria per consigli AI)"
     }
   ],
   "services": [
@@ -109,10 +119,12 @@
         "POSTGRES_DB": "fantaseriea",
         "DATABASE_URL": "postgresql://postgres:postgres@postgres:5432/fantaseriea",
         "SESSION_SECRET": "your-super-secret-session-key-change-this-in-production",
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "FOOTBALL_DATA_API_KEY": "${FOOTBALL_DATA_API_KEY}",
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
       },
       "ports": [
-        "3000:5000"
+        "3000:5001"
       ],
       "depends_on": [
         "postgres"
@@ -122,7 +134,7 @@
       ],
       "restart": "unless-stopped",
       "healthcheck": {
-        "test": ["CMD", "curl", "-f", "http://localhost:5000/api/health"],
+        "test": ["CMD", "curl", "-f", "http://localhost:5001/api/health"],
         "interval": "30s",
         "timeout": "10s",
         "retries": 3,

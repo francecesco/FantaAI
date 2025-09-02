@@ -10,7 +10,15 @@ DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fantaseriea
 SESSION_SECRET=your-super-secret-session-key-change-this-in-production
 NODE_ENV=production
 
+# API Keys (OBBLIGATORIE)
+FOOTBALL_DATA_API_KEY=your-football-data-api-key-here
+GEMINI_API_KEY=your-gemini-api-key-here
+
 # Note:
 # - POSTGRES_PASSWORD: Cambia in produzione per sicurezza
 # - SESSION_SECRET: Cambia in produzione per sicurezza
-# - Tutte le altre variabili possono rimanere come sono
+# - FOOTBALL_DATA_API_KEY: OBBLIGATORIA per dati reali Serie A 2025/26
+# - GEMINI_API_KEY: OBBLIGATORIA per consigli AI
+# - Ottieni le chiavi API da:
+#   * Football-Data.org: https://www.football-data.org/
+#   * Google AI Studio: https://aistudio.google.com/

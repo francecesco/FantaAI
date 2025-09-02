@@ -23,6 +23,10 @@ cd FantaAI
 git clone https://github.com/francecesco/FantaAI.git
 cd FantaAI
 
+# Configura l'API Key di Gemini (opzionale)
+cp env.example .env
+# Modifica .env e aggiungi la tua GEMINI_API_KEY
+
 # Genera certificati SSL
 ./generate-ssl.sh
 
@@ -33,6 +37,31 @@ cd FantaAI
 # HTTP:  http://localhost
 # HTTPS: https://localhost
 ```
+
+### 🤖 Configurazione AI (Gemini)
+Per abilitare i consigli AI avanzati:
+
+1. **Ottieni una API Key da Google AI Studio**: https://makersuite.google.com/app/apikey
+2. **Configura la variabile d'ambiente**:
+   ```bash
+   export GEMINI_API_KEY=your-api-key-here
+   ```
+3. **Riavvia l'applicazione**
+
+> **Nota**: Senza API Key, l'applicazione userà algoritmi tradizionali per le raccomandazioni.
+
+### ⚽ Configurazione Dati Calcio (Football-Data.org)
+Per utilizzare dati reali dei giocatori Serie A 2025/26:
+
+1. **Registrati su Football-Data.org**: https://www.football-data.org/
+2. **Ottieni la chiave API gratuita** (10 richieste/minuto, 100 richieste/giorno)
+3. **Configura la variabile d'ambiente**:
+   ```bash
+   export FOOTBALL_DATA_API_KEY=your-football-data-api-key-here
+   ```
+4. **Riavvia l'applicazione**
+
+> **⚠️ IMPORTANTE**: Senza FOOTBALL_DATA_API_KEY, l'applicazione non funzionerà. I dati mock sono stati rimossi per garantire dati sempre aggiornati.
 
 ### Opzione 2: Installazione Locale
 

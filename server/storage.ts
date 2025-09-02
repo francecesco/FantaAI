@@ -18,6 +18,7 @@ import {
 import { db } from "./db";
 import { eq, and, sql, desc, asc } from "drizzle-orm";
 import { footballDataService } from "./football-api";
+import { aiService } from "./ai-service";
 import type { 
   TeamStats, 
   PlayerRecommendation, 
@@ -299,8 +300,71 @@ export class DatabaseStorage implements IStorage {
     
     const availablePlayers = allPlayers.filter(p => !ownedPlayerIds.has(p.id));
 
-    // Enhanced recommendation algorithm per principianti
-    const recommendations = availablePlayers
+    // Usa AI Gemini se disponibile, altrimenti algoritmo tradizionale
+    if (aiService.isAvailable()) {
+      console.log('🤖 Usando Gemini AI per le raccomandazioni...');
+      return this.getAIRecommendations(availablePlayers, userTeamData, teamStats);
+    } else {
+      console.log('📊 Usando algoritmo tradizionale per le raccomandazioni...');
+      return this.getTraditionalRecommendations(availablePlayers, userTeamData, teamStats);
+    }
+  }
+
+  private async getAIRecommendations(availablePlayers: Player[], userTeamData: UserTeam[], teamStats: TeamStats): Promise<PlayerRecommendation[]> {
+    const recommendations: PlayerRecommendation[] = [];
+    
+    // Analizza solo i primi 3 giocatori più promettenti per rispettare i limiti di quota
+    const topCandidates = availablePlayers
+      .map(player => ({
+        player,
+        valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats)
+      }))
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 3);
+
+    // Processa uno alla volta con delay per evitare rate limiting
+    for (const { player } of topCandidates) {
+      try {
+        const aiAnalysis = await aiService.analyzePlayer(player, userTeamData, teamStats);
+        recommendations.push({
+          player,
+          valueScore: aiAnalysis.valueScore,
+          reason: `${aiAnalysis.recommendation} - ${aiAnalysis.reasoning}`,
+        });
+        
+        // Delay di 5 secondi tra le richieste per rispettare i limiti
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      } catch (error) {
+        console.error(`Errore AI per ${player.name}:`, error);
+        // Fallback all'algoritmo tradizionale
+        recommendations.push({
+          player,
+          valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats),
+          reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
+        });
+      }
+    }
+
+    // Completa con algoritmi tradizionali per arrivare a 8 raccomandazioni
+    const remainingPlayers = availablePlayers
+      .filter(p => !recommendations.some(r => r.player.id === p.id))
+      .map(player => ({
+        player,
+        valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats),
+        reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
+      }))
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 8 - recommendations.length);
+
+    recommendations.push(...remainingPlayers);
+
+    return recommendations
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 8);
+  }
+
+  private getTraditionalRecommendations(availablePlayers: Player[], userTeamData: UserTeam[], teamStats: TeamStats): PlayerRecommendation[] {
+    return availablePlayers
       .map(player => {
         const valueScore = this.calculateBeginnerValueScore(player, userTeamData, teamStats);
         return {
@@ -311,8 +375,6 @@ export class DatabaseStorage implements IStorage {
       })
       .sort((a, b) => b.valueScore - a.valueScore)
       .slice(0, 8);
-
-    return recommendations;
   }
 
   private calculateBeginnerValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
@@ -648,6 +710,19 @@ export class DatabaseStorage implements IStorage {
 
     return formations;
   }
+
+  async getAITeamAnalysis(userTeam: UserTeam[], teamStats: TeamStats, availablePlayers: Player[]): Promise<any> {
+    if (aiService.isAvailable()) {
+      try {
+        return await aiService.analyzeTeam(userTeam, teamStats, availablePlayers);
+      } catch (error) {
+        console.error('Errore nell\'analisi AI della squadra:', error);
+        return aiService.getFallbackTeamAnalysis(userTeam, teamStats);
+      }
+    } else {
+      return aiService.getFallbackTeamAnalysis(userTeam, teamStats);
+    }
+  }
 }
 
 // MemStorage implementation for when database is offline
@@ -886,7 +961,71 @@ export class MemStorage implements IStorage {
     
     const availablePlayers = this.playersData.filter(p => !ownedPlayerIds.has(p.id) && p.isActive);
 
-    const recommendations = availablePlayers
+    // Usa AI Gemini se disponibile, altrimenti algoritmo tradizionale
+    if (aiService.isAvailable()) {
+      console.log('🤖 Usando Gemini AI per le raccomandazioni (MemStorage)...');
+      return this.getAIRecommendations(availablePlayers, userTeamData, teamStats);
+    } else {
+      console.log('📊 Usando algoritmo tradizionale per le raccomandazioni (MemStorage)...');
+      return this.getTraditionalRecommendations(availablePlayers, userTeamData, teamStats);
+    }
+  }
+
+  private async getAIRecommendations(availablePlayers: Player[], userTeamData: UserTeam[], teamStats: TeamStats): Promise<PlayerRecommendation[]> {
+    const recommendations: PlayerRecommendation[] = [];
+    
+    // Analizza solo i primi 3 giocatori più promettenti per rispettare i limiti di quota
+    const topCandidates = availablePlayers
+      .map(player => ({
+        player,
+        valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats)
+      }))
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 3);
+
+    // Processa uno alla volta con delay per evitare rate limiting
+    for (const { player } of topCandidates) {
+      try {
+        const aiAnalysis = await aiService.analyzePlayer(player, userTeamData, teamStats);
+        recommendations.push({
+          player,
+          valueScore: aiAnalysis.valueScore,
+          reason: `${aiAnalysis.recommendation} - ${aiAnalysis.reasoning}`,
+        });
+        
+        // Delay di 5 secondi tra le richieste per rispettare i limiti
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      } catch (error) {
+        console.error(`Errore AI per ${player.name}:`, error);
+        // Fallback all'algoritmo tradizionale
+        recommendations.push({
+          player,
+          valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats),
+          reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
+        });
+      }
+    }
+
+    // Completa con algoritmi tradizionali per arrivare a 8 raccomandazioni
+    const remainingPlayers = availablePlayers
+      .filter(p => !recommendations.some(r => r.player.id === p.id))
+      .map(player => ({
+        player,
+        valueScore: this.calculateBeginnerValueScore(player, userTeamData, teamStats),
+        reason: this.generateBeginnerRecommendationReason(player, userTeamData, teamStats),
+      }))
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 8 - recommendations.length);
+
+    recommendations.push(...remainingPlayers);
+
+    return recommendations
+      .sort((a, b) => b.valueScore - a.valueScore)
+      .slice(0, 8);
+  }
+
+  private getTraditionalRecommendations(availablePlayers: Player[], userTeamData: UserTeam[], teamStats: TeamStats): PlayerRecommendation[] {
+    return availablePlayers
       .map(player => {
         const valueScore = this.calculateBeginnerValueScore(player, userTeamData, teamStats);
         return {
@@ -897,8 +1036,6 @@ export class MemStorage implements IStorage {
       })
       .sort((a, b) => b.valueScore - a.valueScore)
       .slice(0, 8);
-
-    return recommendations;
   }
 
   private calculateBeginnerValueScore(player: Player, userTeam: UserTeam[], teamStats: TeamStats): number {
@@ -1058,6 +1195,19 @@ export class MemStorage implements IStorage {
     };
 
     return formations;
+  }
+
+  async getAITeamAnalysis(userTeam: UserTeam[], teamStats: TeamStats, availablePlayers: Player[]): Promise<any> {
+    if (aiService.isAvailable()) {
+      try {
+        return await aiService.analyzeTeam(userTeam, teamStats, availablePlayers);
+      } catch (error) {
+        console.error('Errore nell\'analisi AI della squadra:', error);
+        return aiService.getFallbackTeamAnalysis(userTeam, teamStats);
+      }
+    } else {
+      return aiService.getFallbackTeamAnalysis(userTeam, teamStats);
+    }
   }
 }
 

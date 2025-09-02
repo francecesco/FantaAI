@@ -40,8 +40,12 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/fantaseriea
       SESSION_SECRET: your-super-secret-session-key-change-this-in-production
       NODE_ENV: production
+      # Football Data API
+      FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY}
+      # AI Configuration
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
-      - "3000:5000"
+      - "3000:5001"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
