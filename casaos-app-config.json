@@ -78,6 +78,11 @@
       "description": "Chiave API per Football-Data.org (obbligatoria per dati reali)"
     },
     {
+      "name": "API_FOOTBALL_KEY",
+      "value": "",
+      "description": "Chiave API per API-Football (opzionale per statistiche dettagliate)"
+    },
+    {
       "name": "GEMINI_API_KEY",
       "value": "",
       "description": "Chiave API per Google Gemini AI (obbligatoria per consigli AI)"
@@ -121,6 +126,7 @@
         "SESSION_SECRET": "your-super-secret-session-key-change-this-in-production",
         "NODE_ENV": "production",
         "FOOTBALL_DATA_API_KEY": "${FOOTBALL_DATA_API_KEY}",
+        "API_FOOTBALL_KEY": "${API_FOOTBALL_KEY}",
         "GEMINI_API_KEY": "${GEMINI_API_KEY}"
       },
       "ports": [

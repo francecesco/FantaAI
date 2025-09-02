@@ -42,6 +42,8 @@ services:
       NODE_ENV: production
       # Football Data API
       FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY}
+      # API-Football API (opzionale per statistiche)
+      API_FOOTBALL_KEY: ${API_FOOTBALL_KEY}
       # AI Configuration
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:

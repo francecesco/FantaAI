@@ -50,7 +50,9 @@ Per abilitare i consigli AI avanzati:
 
 > **Nota**: Senza API Key, l'applicazione userà algoritmi tradizionali per le raccomandazioni.
 
-### ⚽ Configurazione Dati Calcio (Football-Data.org)
+### ⚽ Configurazione Dati Calcio
+
+#### Football-Data.org (OBBLIGATORIA)
 Per utilizzare dati reali dei giocatori Serie A 2025/26:
 
 1. **Registrati su Football-Data.org**: https://www.football-data.org/
@@ -59,9 +61,18 @@ Per utilizzare dati reali dei giocatori Serie A 2025/26:
    ```bash
    export FOOTBALL_DATA_API_KEY=your-football-data-api-key-here
    ```
-4. **Riavvia l'applicazione**
 
-> **⚠️ IMPORTANTE**: Senza FOOTBALL_DATA_API_KEY, l'applicazione non funzionerà. I dati mock sono stati rimossi per garantire dati sempre aggiornati.
+#### API-Football (OPZIONALE - per statistiche dettagliate)
+Per statistiche reali (gol, assist, partite giocate):
+
+1. **Registrati su API-Football**: https://www.api-football.com/
+2. **Ottieni la chiave API gratuita** (100 richieste/giorno)
+3. **Configura la variabile d'ambiente**:
+   ```bash
+   export API_FOOTBALL_KEY=your-api-football-key-here
+   ```
+
+> **⚠️ IMPORTANTE**: Senza FOOTBALL_DATA_API_KEY, l'applicazione non funzionerà. API_FOOTBALL_KEY è opzionale ma migliora significativamente la qualità delle statistiche.
 
 ### Opzione 2: Installazione Locale
 

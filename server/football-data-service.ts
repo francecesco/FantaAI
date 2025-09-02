@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { Player, InsertPlayer } from '@shared/schema';
 import { fileURLToPath } from 'url';
 import * as path from 'path';
+import { apiFootballStatsService } from './api-football-stats-service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -148,11 +149,19 @@ export class FootballDataService {
         console.log(`✅ ${team.name}: ${teamPlayers} giocatori elaborati, ${discardedPlayers} scartati`);
       }
 
-      // Salva in cache
-      await this.saveCache(allPlayers);
-
-      console.log(`✅ Caricati ${allPlayers.length} giocatori Serie A 2025/26 da Football-Data.org`);
-      return allPlayers;
+                        // Aggiorna le statistiche con API-Football se disponibile
+                  if (apiFootballStatsService.isAvailable()) {
+                    console.log('📊 Aggiornamento statistiche con API-Football...');
+                    const playersWithStats = await apiFootballStatsService.updatePlayersStats(allPlayers);
+                    await this.saveCache(playersWithStats);
+                    console.log(`✅ Caricati ${playersWithStats.length} giocatori Serie A 2025/26 con statistiche reali`);
+                    return playersWithStats;
+                  } else {
+                    console.log('⚠️ API-Football non disponibile, usando statistiche base');
+                    await this.saveCache(allPlayers);
+                    console.log(`✅ Caricati ${allPlayers.length} giocatori Serie A 2025/26 da Football-Data.org`);
+                    return allPlayers;
+                  }
     } catch (error) {
       console.error('❌ Errore nel caricamento giocatori:', error);
       throw error;
@@ -174,7 +183,7 @@ export class FootballDataService {
       team: teamName,
       price,
       rating: rating.toString(),
-      goals: 0, // Football-Data non fornisce statistiche dettagliate
+      goals: 0, // Sarà aggiornato con API-Football
       assists: 0,
       yellowCards: 0,
       redCards: 0,
@@ -262,6 +271,8 @@ export class FootballDataService {
     
     return Math.round(Math.max(5, Math.min(50, basePrice)));
   }
+
+
 
   private async getCachedPlayers(): Promise<InsertPlayer[]> {
     try {
