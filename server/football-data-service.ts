@@ -196,19 +196,20 @@ export class FootballDataService {
         console.log(`✅ ${team.name}: ${teamPlayers} giocatori elaborati, ${discardedPlayers} scartati`);
       }
 
-                        // Aggiorna le statistiche con API-Football se disponibile
+                        // Salva prima i giocatori base per permettere al server di avviarsi
+                  await this.saveCache(allPlayers);
+                  console.log(`✅ Caricati ${allPlayers.length} giocatori Serie A 2025/26 da Football-Data.org`);
+                  
+                  // Aggiorna le statistiche in background (non blocca il server)
                   if (apiFootballStatsService.isAvailable()) {
-                    console.log('📊 Aggiornamento statistiche con API-Football...');
-                    const playersWithStats = await apiFootballStatsService.updatePlayersStats(allPlayers);
-                    await this.saveCache(playersWithStats);
-                    console.log(`✅ Caricati ${playersWithStats.length} giocatori Serie A 2025/26 con statistiche reali`);
-                    return playersWithStats;
+                    console.log('📊 Aggiornamento statistiche con API-Football in background...');
+                    // Avvia l'aggiornamento in background senza aspettare
+                    this.updateStatsInBackground(allPlayers);
                   } else {
                     console.log('⚠️ API-Football non disponibile, usando statistiche base');
-                    await this.saveCache(allPlayers);
-                    console.log(`✅ Caricati ${allPlayers.length} giocatori Serie A 2025/26 da Football-Data.org`);
-                    return allPlayers;
                   }
+                  
+                  return allPlayers;
     } catch (error) {
       console.error('❌ Errore nel caricamento giocatori:', error);
       throw error;
@@ -464,6 +465,17 @@ export class FootballDataService {
   clearCache(): void {
     this.cache.clear();
     console.log('🗑️ Cache in memoria svuotata');
+  }
+
+  private async updateStatsInBackground(players: InsertPlayer[]): Promise<void> {
+    try {
+      console.log('🔄 Avvio aggiornamento statistiche in background...');
+      const playersWithStats = await apiFootballStatsService.updatePlayersStats(players);
+      await this.saveCache(playersWithStats);
+      console.log(`✅ Statistiche aggiornate in background: ${playersWithStats.length} giocatori`);
+    } catch (error) {
+      console.error('❌ Errore aggiornamento statistiche in background:', error);
+    }
   }
 }
 
