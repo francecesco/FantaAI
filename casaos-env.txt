@@ -10,15 +10,9 @@ DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fantaseriea
 SESSION_SECRET=your-super-secret-session-key-change-this-in-production
 NODE_ENV=production
 
-# API Keys (OBBLIGATORIE per dati reali)
+# API Keys (OBBLIGATORIE)
 FOOTBALL_DATA_API_KEY=your-football-data-api-key-here
 GEMINI_API_KEY=your-gemini-api-key-here
 
-# API Keys (OPZIONALI per statistiche dettagliate)
+# API Keys (OPZIONALI)
 API_FOOTBALL_KEY=your-api-football-key-here
-
-# Note:
-# - Sostituisci "your-*-api-key-here" con le tue chiavi API reali
-# - FOOTBALL_DATA_API_KEY: Ottieni da https://www.football-data.org/
-# - GEMINI_API_KEY: Ottieni da https://aistudio.google.com/
-# - API_FOOTBALL_KEY: Ottieni da https://rapidapi.com/api-sports/api/api-football

@@ -19,7 +19,7 @@
   "ports": [
     {
       "name": "HTTP",
-      "port": 3000,
+      "port": 3002,
       "protocol": "http",
       "description": "Accesso all'applicazione FantaAI"
     }
@@ -135,7 +135,7 @@
         "GEMINI_API_KEY": "${GEMINI_API_KEY}"
       },
       "ports": [
-        "3000:5001"
+        "3002:5001"
       ],
       "volumes": [
         "cache_data:/app/server/cache"

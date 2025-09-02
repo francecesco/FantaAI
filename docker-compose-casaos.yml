@@ -2,8 +2,20 @@ version: '3.8'
 
 services:
   fantai:
-    build: .
+    image: node:18-alpine
     container_name: fantai-app
+    working_dir: /app
+    command: >
+      sh -c "
+        echo '🚀 Avvio FantaAI...' &&
+        apk add --no-cache postgresql-client curl &&
+        echo '📦 Installazione dipendenze...' &&
+        npm install &&
+        echo '🔨 Build applicazione...' &&
+        npm run build &&
+        echo '🌐 Avvio server...' &&
+        npm start
+      "
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -13,28 +25,19 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/fantaseriea
       SESSION_SECRET: your-super-secret-session-key-change-this-in-production
       NODE_ENV: production
-      # Football Data API
       FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY}
-      # API-Football API (opzionale per statistiche)
       API_FOOTBALL_KEY: ${API_FOOTBALL_KEY}
-      # AI Configuration
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
       - "3000:5001"
     volumes:
-      - ./server/cache:/app/server/cache
+      - /DATA/AppData/FantaAI:/app
+      - /DATA/AppData/FantaAI/server/cache:/app/server/cache
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
+    restart: unless-stopped
     networks:
       - fantai_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5001/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
   postgres:
     image: postgres:15-alpine
@@ -45,18 +48,12 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
     networks:
       - fantai_network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   postgres_data:
-    driver: local
 
 networks:
   fantai_network:
