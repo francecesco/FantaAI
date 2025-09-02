@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Clock, Trophy, MapPin } from "lucide-react";
 import { FormationViewer } from "@/components/formation-viewer";
+import { Header } from "@/components/layout/header";
+import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Match } from "@shared/schema";
 
 export default function Calendar() {
@@ -65,11 +67,12 @@ export default function Calendar() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center space-x-3">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <Header />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center space-x-3 mb-6">
             <CalendarIcon className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-3xl font-bold text-foreground">Calendario Serie A</h1>
@@ -77,9 +80,7 @@ export default function Calendar() {
             </div>
           </div>
         </div>
-      </div>
 
-      <main className="container mx-auto px-4 py-6">
         {/* Filtro per giornata */}
         <div className="mb-6">
           <div className="flex flex-wrap gap-2">
@@ -206,6 +207,8 @@ export default function Calendar() {
           </Card>
         )}
       </main>
+      
+      <MobileNav />
     </div>
   );
 }
