@@ -111,5 +111,8 @@ echo "   DATABASE_URL: $DATABASE_URL"
 # Attendi PostgreSQL
 wait_for_postgres
 
-# Avvia il server direttamente (l'inizializzazione avverrà automaticamente)
+# Inizializza il database se necessario
+init_database
+
+# Avvia il server
 start_server
