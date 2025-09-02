@@ -19,8 +19,15 @@ wait_for_postgres() {
 init_database() {
     echo "🗄️  Inizializzazione database..."
     
-    # Crea il database se non esiste
-    createdb -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_DB 2>/dev/null || echo "Database già esistente"
+    # Controlla se il database esiste
+    echo "🔍 Controllo esistenza database..."
+    if psql -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER -lqt | cut -d \| -f 1 | grep -qw $POSTGRES_DB; then
+        echo "✅ Database già esistente"
+    else
+        echo "📊 Creazione database..."
+        createdb -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER $POSTGRES_DB
+        echo "✅ Database creato"
+    fi
     
     # Sincronizza lo schema
     echo "🔄 Sincronizzazione schema database..."
