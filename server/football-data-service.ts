@@ -3,6 +3,7 @@ import type { Player, InsertPlayer } from '@shared/schema';
 import { fileURLToPath } from 'url';
 import * as path from 'path';
 import { apiFootballStatsService } from './api-football-stats-service';
+import { cacheService } from './cache-service';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -56,7 +57,7 @@ export class FootballDataService {
   private baseURL = 'https://api.football-data.org/v4';
   private apiKey: string;
   private cache: Map<string, { data: any; timestamp: number }> = new Map();
-  private cacheTimeout = 30 * 60 * 1000; // 30 minuti
+  private cacheTimeout = 30 * 60 * 1000; // 30 minuti per cache in memoria
 
   constructor() {
     this.apiKey = process.env.FOOTBALL_DATA_API_KEY || '';
@@ -102,10 +103,9 @@ export class FootballDataService {
       throw new Error('❌ FOOTBALL_DATA_API_KEY non configurata. Configura la chiave API per utilizzare dati reali.');
     }
 
-    // Prova prima a leggere dalla cache
+    // Prova prima a leggere dalla cache persistente
     const cachedPlayers = await this.getCachedPlayers();
     if (cachedPlayers.length > 0) {
-      console.log(`📦 Caricamento ${cachedPlayers.length} giocatori dalla cache`);
       return cachedPlayers;
     }
     
@@ -275,41 +275,17 @@ export class FootballDataService {
 
 
   private async getCachedPlayers(): Promise<InsertPlayer[]> {
-    try {
-      const fs = await import('fs');
-      const cacheFile = path.join(__dirname, 'football-data-cache.json');
-      
-      if (fs.existsSync(cacheFile)) {
-        const data = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
-        const cacheAge = Date.now() - new Date(data.timestamp).getTime();
-        
-        // Cache valida per 30 minuti
-        if (cacheAge < 30 * 60 * 1000) {
-          return data.players || [];
-        }
-      }
-    } catch (error) {
-      console.error('❌ Errore lettura cache:', error);
+    const cachedPlayers = await cacheService.get<InsertPlayer[]>('players');
+    if (cachedPlayers) {
+      console.log(`📦 Caricamento ${cachedPlayers.length} giocatori dalla cache persistente`);
+      return cachedPlayers;
     }
     return [];
   }
 
   private async saveCache(players: InsertPlayer[]): Promise<void> {
-    try {
-      const fs = await import('fs');
-      const cacheFile = path.join(__dirname, 'football-data-cache.json');
-      
-      const data = {
-        timestamp: new Date().toISOString(),
-        players,
-        totalPlayers: players.length
-      };
-      
-      fs.writeFileSync(cacheFile, JSON.stringify(data, null, 2));
-      console.log(`💾 Cache salvata: ${players.length} giocatori`);
-    } catch (error) {
-      console.error('❌ Errore salvataggio cache:', error);
-    }
+    await cacheService.set('players', players, 25); // 25 ore per sicurezza
+    console.log(`💾 Cache persistente salvata: ${players.length} giocatori`);
   }
 
   isAvailable(): boolean {

@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { schedulerService } from "./scheduler-service";
 
 const app = express();
 app.use(express.json());
@@ -68,5 +69,12 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Inizializza il scheduler per il refresh giornaliero
+    console.log('🚀 Scheduler di refresh giornaliero inizializzato');
+    const status = schedulerService.getStatus();
+    console.log(`📅 Ultimo refresh: ${status.lastRefresh || 'Mai'}`);
+    console.log(`🔄 Prossimo refresh: ${status.nextRefresh}`);
+    console.log(`⏰ Refresh necessario: ${status.needsRefresh ? 'Sì' : 'No'}`);
   });
 })();

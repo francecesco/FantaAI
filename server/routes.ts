@@ -256,6 +256,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cache management endpoints
+  app.get("/api/admin/cache/status", async (req, res) => {
+    try {
+      const { schedulerService } = await import("./scheduler-service");
+      const { cacheService } = await import("./cache-service");
+      
+      const schedulerStatus = schedulerService.getStatus();
+      const cacheInfo = await cacheService.getCacheInfo();
+      
+      res.json({
+        scheduler: schedulerStatus,
+        cache: cacheInfo
+      });
+    } catch (error) {
+      console.error("Error getting cache status:", error);
+      res.status(500).json({ message: "Failed to get cache status", error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  app.post("/api/admin/cache/refresh", async (req, res) => {
+    try {
+      const { schedulerService } = await import("./scheduler-service");
+      await schedulerService.forceRefresh();
+      res.json({ message: "Cache refresh completed successfully" });
+    } catch (error) {
+      console.error("Error forcing cache refresh:", error);
+      res.status(500).json({ message: "Failed to refresh cache", error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
+  app.delete("/api/admin/cache/clear", async (req, res) => {
+    try {
+      const { cacheService } = await import("./cache-service");
+      await cacheService.clear();
+      res.json({ message: "Cache cleared successfully" });
+    } catch (error) {
+      console.error("Error clearing cache:", error);
+      res.status(500).json({ message: "Failed to clear cache", error: error instanceof Error ? error.message : 'Unknown error' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
