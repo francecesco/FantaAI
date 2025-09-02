@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,6 +24,7 @@ export function PlayerSearch({
   const [searchTerm, setSearchTerm] = useState("");
   const [position, setPosition] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
+  const [visiblePlayers, setVisiblePlayers] = useState(12);
 
   const { data: players = [], isLoading } = useQuery<Player[]>({
     queryKey: ["/api/players", { 
@@ -35,6 +36,15 @@ export function PlayerSearch({
   });
 
   const filteredPlayers = players.filter(player => !excludePlayerIds.includes(player.id));
+
+  const handleLoadMore = () => {
+    setVisiblePlayers(prev => prev + 12);
+  };
+
+  // Reset visible players when filters change
+  useEffect(() => {
+    setVisiblePlayers(12);
+  }, [searchTerm, position, priceRange]);
 
   return (
     <Card>
@@ -101,7 +111,7 @@ export function PlayerSearch({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="players-grid">
-            {filteredPlayers.slice(0, 12).map((player) => (
+            {filteredPlayers.slice(0, visiblePlayers).map((player) => (
               <PlayerCard
                 key={player.id}
                 player={player}
@@ -114,10 +124,14 @@ export function PlayerSearch({
           </div>
         )}
 
-        {filteredPlayers.length > 12 && (
+        {filteredPlayers.length > visiblePlayers && (
           <div className="text-center">
-            <Button variant="outline" data-testid="button-load-more">
-              Carica altri giocatori
+            <Button 
+              variant="outline" 
+              onClick={handleLoadMore}
+              data-testid="button-load-more"
+            >
+              Carica altri giocatori ({filteredPlayers.length - visiblePlayers} rimanenti)
             </Button>
           </div>
         )}
