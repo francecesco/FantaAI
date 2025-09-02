@@ -1,0 +1,16 @@
+# Variabili d'ambiente per CasaOS
+# Copia e incolla queste variabili nella configurazione CasaOS
+
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=fantaseriea
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/fantaseriea
+SESSION_SECRET=your-super-secret-session-key-change-this-in-production
+NODE_ENV=production
+
+# Note:
+# - POSTGRES_PASSWORD: Cambia in produzione per sicurezza
+# - SESSION_SECRET: Cambia in produzione per sicurezza
+# - Tutte le altre variabili possono rimanere come sono

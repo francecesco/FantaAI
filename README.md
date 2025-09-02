@@ -6,6 +6,18 @@ Un'applicazione di fantacalcio per la Serie A con React, TypeScript, Express e P
 
 ### Opzione 1: Docker (Raccomandato per CasaOS) 🐳
 
+#### Installazione su CasaOS
+```bash
+# Clona il repository
+git clone https://github.com/francecesco/FantaAI.git
+cd FantaAI
+
+# Importa in CasaOS usando il file ottimizzato
+# File: docker-compose-casaos.yml
+# Vai su CasaOS → App Store → Import App → Docker Compose
+```
+
+#### Installazione Locale con Docker
 ```bash
 # Clona il repository
 git clone https://github.com/francecesco/FantaAI.git
@@ -206,7 +218,41 @@ npm run check        # Controllo TypeScript
 - **Connection pooling** database
 - **Health checks** automatici
 
+## 🏠 Installazione su CasaOS
+
+### Metodo Rapido
+1. **Clona il repository** su CasaOS
+2. **Apri CasaOS** → **App Store** → **Import App**
+3. **Seleziona "Docker Compose"** e carica `docker-compose-casaos.yml`
+4. **Configura le variabili** d'ambiente (già preimpostate)
+5. **Avvia l'installazione**
+
+### File di Configurazione
+- **`docker-compose-casaos.yml`**: Versione ottimizzata per CasaOS
+- **`CASAOS_INSTALLATION.md`**: Guida dettagliata per CasaOS
+- **`casaos-app-config.json`**: Configurazione JSON per CasaOS
+
+### Accesso dopo Installazione
+- **URL**: `http://[IP_CASAOS]:3000`
+- **API Health**: `http://[IP_CASAOS]:3000/api/health`
+
 ## 🔧 Risoluzione Problemi
+
+### CasaOS
+```bash
+# Controlla stato container
+docker ps
+
+# Log applicazione
+docker logs fantai-app -f
+
+# Log database
+docker logs fantai-postgres -f
+
+# Reset completo
+docker-compose -f docker-compose-casaos.yml down -v
+docker-compose -f docker-compose-casaos.yml up -d
+```
 
 ### Docker
 ```bash
