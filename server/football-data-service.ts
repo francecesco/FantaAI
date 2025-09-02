@@ -18,6 +18,7 @@ interface FootballDataTeam {
   clubColors: string;
   venue: string;
   lastUpdated: string;
+  squad: FootballDataPlayer[];
 }
 
 interface FootballDataPlayer {
@@ -106,6 +107,10 @@ export class FootballDataService {
       console.log(`📦 Caricamento ${cachedPlayers.length} giocatori dalla cache`);
       return cachedPlayers;
     }
+    
+    console.log('🔄 Cache vuota o scaduta, ricaricamento da API...');
+    // Svuota anche la cache in memoria per forzare il ricaricamento
+    this.clearCache();
 
     console.log('🌐 Caricamento giocatori Serie A 2025/26 da Football-Data.org...');
     
@@ -123,17 +128,24 @@ export class FootballDataService {
       for (let i = 0; i < teamsResponse.teams.length; i++) {
         const team = teamsResponse.teams[i];
         console.log(`📋 [${i + 1}/${teamsResponse.teams.length}] Elaborazione giocatori ${team.name}...`);
+        console.log(`🔍 Squadra ${team.name} ha ${team.squad?.length || 0} giocatori nella squadra`);
         
         let teamPlayers = 0;
-        for (const playerData of team.squad) {
-          const player = this.transformFootballDataPlayerToPlayer(playerData, team.name);
-          if (player) {
-            allPlayers.push(player);
-            teamPlayers++;
+        let discardedPlayers = 0;
+        if (team.squad) {
+          for (const playerData of team.squad) {
+            const player = this.transformFootballDataPlayerToPlayer(playerData, team.name);
+            if (player) {
+              allPlayers.push(player);
+              teamPlayers++;
+            } else {
+              discardedPlayers++;
+              console.log(`⚠️ Scartato giocatore ${playerData.name} (posizione: ${playerData.position})`);
+            }
           }
         }
         
-        console.log(`✅ ${team.name}: ${teamPlayers} giocatori elaborati`);
+        console.log(`✅ ${team.name}: ${teamPlayers} giocatori elaborati, ${discardedPlayers} scartati`);
       }
 
       // Salva in cache
@@ -173,15 +185,33 @@ export class FootballDataService {
 
   private mapPosition(footballDataPosition: string): string | null {
     const positionMap: Record<string, string> = {
+      // Portieri
       'Goalkeeper': 'P',
+      
+      // Difensori
       'Defence': 'D',
       'Defender': 'D',
+      'Centre-Back': 'D',
+      'Left-Back': 'D',
+      'Right-Back': 'D',
+      
+      // Centrocampisti
       'Midfield': 'C',
       'Midfielder': 'C',
+      'Central Midfield': 'C',
+      'Defensive Midfield': 'C',
+      'Attacking Midfield': 'C',
+      'Left Midfield': 'C',
+      'Right Midfield': 'C',
+      
+      // Attaccanti
       'Offence': 'A',
       'Attacker': 'A',
       'Forward': 'A',
-      'Striker': 'A'
+      'Striker': 'A',
+      'Centre-Forward': 'A',
+      'Left Winger': 'A',
+      'Right Winger': 'A'
     };
     return positionMap[footballDataPosition] || null;
   }
@@ -273,6 +303,11 @@ export class FootballDataService {
 
   isAvailable(): boolean {
     return !!this.apiKey;
+  }
+
+  clearCache(): void {
+    this.cache.clear();
+    console.log('🗑️ Cache in memoria svuotata');
   }
 }
 
