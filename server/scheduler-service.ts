@@ -61,7 +61,6 @@ export class SchedulerService {
       // 2. Refresh calendario
       console.log('📅 Aggiornamento calendario Serie A...');
       const calendar = await footballDataService.getSerieACalendar();
-      await cacheService.set('calendar', calendar, 25); // 25 ore per sicurezza
       console.log(`✅ ${calendar.length} partite aggiornate e salvate in cache`);
 
       // 3. Marca il refresh come completato

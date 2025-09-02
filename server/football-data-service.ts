@@ -23,6 +23,44 @@ interface FootballDataTeam {
   squad: FootballDataPlayer[];
 }
 
+interface FootballDataMatch {
+  id: number;
+  utcDate: string;
+  status: string;
+  matchday: number;
+  stage: string;
+  group: string | null;
+  lastUpdated: string;
+  homeTeam: {
+    id: number;
+    name: string;
+    shortName: string;
+    tla: string;
+    crest: string;
+  };
+  awayTeam: {
+    id: number;
+    name: string;
+    shortName: string;
+    tla: string;
+    crest: string;
+  };
+  score: {
+    winner: string | null;
+    duration: string;
+    fullTime: {
+      home: number | null;
+      away: number | null;
+    };
+    halfTime: {
+      home: number | null;
+      away: number | null;
+    };
+  };
+  odds: any;
+  referees: any[];
+}
+
 interface FootballDataPlayer {
   id: number;
   name: string;
@@ -286,6 +324,98 @@ export class FootballDataService {
   private async saveCache(players: InsertPlayer[]): Promise<void> {
     await cacheService.set('players', players, 25); // 25 ore per sicurezza
     console.log(`💾 Cache persistente salvata: ${players.length} giocatori`);
+  }
+
+  async getSerieACalendar(): Promise<InsertMatch[]> {
+    if (!this.apiKey) {
+      throw new Error('❌ FOOTBALL_DATA_API_KEY non configurata. Configura la chiave API per utilizzare dati reali.');
+    }
+
+    // Controlla prima la cache persistente
+    const cachedCalendar = await cacheService.get<InsertMatch[]>('calendar');
+    if (cachedCalendar) {
+      console.log(`📦 Caricamento ${cachedCalendar.length} partite dalla cache persistente`);
+      return cachedCalendar;
+    }
+
+    console.log('🔄 Cache vuota o scaduta, ricaricamento calendario da API...');
+    this.clearCache(); // Svuota cache in memoria
+
+    console.log('🌐 Caricamento calendario Serie A 2025/26 da Football-Data.org...');
+    
+    try {
+      // Ottieni tutte le partite Serie A 2025/26
+      const matchesResponse = await this.makeRequest<FootballDataResponse<FootballDataMatch>>('/competitions/SA/matches', {
+        season: 2025
+      });
+
+      const allMatches: InsertMatch[] = [];
+      
+      console.log(`📋 Trovate ${matchesResponse.matches.length} partite Serie A 2025/26`);
+
+      for (const matchData of matchesResponse.matches) {
+        const match = this.transformFootballDataMatchToMatch(matchData);
+        if (match) {
+          allMatches.push(match);
+        }
+      }
+
+      // Salva in cache per 25 ore
+      await this.saveCalendarCache(allMatches);
+      console.log(`✅ Caricati ${allMatches.length} partite Serie A 2025/26 da Football-Data.org`);
+      
+      return allMatches;
+    } catch (error: any) {
+      console.error('❌ Errore caricamento calendario:', error);
+      throw error;
+    }
+  }
+
+  private transformFootballDataMatchToMatch(footballDataMatch: FootballDataMatch): InsertMatch | null {
+    try {
+      // Per le partite finite, assicurati che i punteggi siano valorizzati
+      let homeScore = footballDataMatch.score?.fullTime?.home;
+      let awayScore = footballDataMatch.score?.fullTime?.away;
+      
+      // Se la partita è finita ma i punteggi sono null, imposta 0
+      if (footballDataMatch.status === 'FINISHED') {
+        homeScore = homeScore ?? 0;
+        awayScore = awayScore ?? 0;
+      }
+
+      return {
+        round: footballDataMatch.matchday || 1,
+        homeTeam: footballDataMatch.homeTeam.name,
+        awayTeam: footballDataMatch.awayTeam.name,
+        homeScore,
+        awayScore,
+        date: new Date(footballDataMatch.utcDate),
+        status: this.mapMatchStatus(footballDataMatch.status),
+        fantacalcioId: footballDataMatch.id?.toString() || null
+      };
+    } catch (error) {
+      console.error('❌ Errore trasformazione partita:', error);
+      return null;
+    }
+  }
+
+  private mapMatchStatus(status: string): string {
+    const statusMap: Record<string, string> = {
+      'SCHEDULED': 'scheduled',
+      'TIMED': 'scheduled',
+      'IN_PLAY': 'live',
+      'PAUSED': 'live',
+      'FINISHED': 'finished',
+      'POSTPONED': 'postponed',
+      'SUSPENDED': 'postponed',
+      'CANCELLED': 'postponed'
+    };
+    return statusMap[status] || 'scheduled';
+  }
+
+  private async saveCalendarCache(matches: InsertMatch[]): Promise<void> {
+    await cacheService.set('calendar', matches, 25); // 25 ore per sicurezza
+    console.log(`💾 Cache persistente calendario salvata: ${matches.length} partite`);
   }
 
   isAvailable(): boolean {

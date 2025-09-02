@@ -16,21 +16,14 @@ export class FantacalcioRealDataService {
   }
 
   async getSerieACalendar(): Promise<InsertMatch[]> {
-    // Controlla prima la cache persistente
-    const cachedCalendar = await cacheService.get<InsertMatch[]>('calendar');
-    if (cachedCalendar) {
-      console.log(`📦 Caricamento ${cachedCalendar.length} partite dalla cache persistente`);
-      return cachedCalendar;
+    if (!footballDataService.isAvailable()) {
+      console.log('⚠️ FOOTBALL_DATA_API_KEY non configurata, uso calendario statico...');
+      // Fallback al calendario statico se l'API non è disponibile
+      return serieACalendar2025_26;
     }
-
-    console.log('📅 Caricamento calendario completo Serie A 2025/26...');
-    const calendar = serieACalendar2025_26;
     
-    // Salva in cache per 25 ore
-    await cacheService.set('calendar', calendar, 25);
-    console.log(`💾 Calendario salvato in cache persistente: ${calendar.length} partite`);
-    
-    return calendar;
+    console.log('🌐 Caricamento calendario Serie A 2025/26 da Football-Data.org...');
+    return await footballDataService.getSerieACalendar();
   }
 }
 
