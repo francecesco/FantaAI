@@ -2,20 +2,8 @@ version: '3.8'
 
 services:
   fantai:
-    image: node:18-alpine
+    build: .
     container_name: fantai-app
-    working_dir: /app
-    command: >
-      sh -c "
-        echo '🚀 Avvio FantaAI...' &&
-        apk add --no-cache postgresql-client curl &&
-        echo '📦 Installazione dipendenze...' &&
-        npm install --include=dev &&
-        echo '🔨 Build applicazione...' &&
-        npm run build &&
-        echo '🌐 Avvio server...' &&
-        npm start
-      "
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
@@ -30,13 +18,9 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
       - "3000:5001"
-    volumes:
-      - /DATA/AppData/FantaAI:/app
     depends_on:
       - postgres
     restart: unless-stopped
-    networks:
-      - fantai_network
 
   postgres:
     image: postgres:15-alpine
@@ -48,12 +32,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
-    networks:
-      - fantai_network
 
 volumes:
   postgres_data:
-
-networks:
-  fantai_network:
-    driver: bridge

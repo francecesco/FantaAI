@@ -26,6 +26,24 @@ ls -la FantaAI/
 
 ### Passo 2: Installare FantaAI su CasaOS
 
+#### **Opzione A: Installazione tramite Terminale (Raccomandato)**
+
+```bash
+# Vai nella directory del progetto
+cd /DATA/AppData/FantaAI
+
+# Avvia con Docker Compose
+docker compose -f docker-compose-casaos.yml up -d
+
+# Controlla lo stato
+docker ps
+
+# Controlla i log
+docker logs fantai-app
+```
+
+#### **Opzione B: Installazione tramite Interfaccia CasaOS**
+
 1. **Vai su CasaOS** → **App Store** → **Import App**
 2. **Seleziona "Docker Compose"**
 3. **Usa il file**: `docker-compose-casaos.yml`

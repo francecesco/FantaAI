@@ -12,9 +12,12 @@ Un'applicazione di fantacalcio per la Serie A con React, TypeScript, Express e P
 git clone https://github.com/francecesco/FantaAI.git
 cd FantaAI
 
-# Importa in CasaOS usando il file ottimizzato
-# File: docker-compose-casaos.yml
+# Avvia con Docker Compose (raccomandato)
+docker compose -f docker-compose-casaos.yml up -d
+
+# Oppure importa in CasaOS usando l'interfaccia
 # Vai su CasaOS → App Store → Import App → Docker Compose
+# File: docker-compose-casaos.yml
 ```
 
 #### Installazione Locale con Docker
