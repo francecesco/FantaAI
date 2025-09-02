@@ -49,7 +49,7 @@ start_server() {
     
     # Attendi che il server sia pronto
     echo "⏳ Attendo che il server sia pronto..."
-    until curl -s http://localhost:5000/api/health > /dev/null 2>&1; do
+    until curl -s http://localhost:5001/api/health > /dev/null 2>&1; do
         echo "Server non è ancora pronto, attendo..."
         sleep 2
     done
@@ -58,11 +58,11 @@ start_server() {
     echo "📊 Statistiche database:"
     
     # Mostra statistiche del database
-    TOTAL_PLAYERS=$(curl -s http://localhost:3000/api/players | jq '. | length' 2>/dev/null || echo "0")
-    PORTIERI=$(curl -s "http://localhost:3000/api/players?position=P" | jq '. | length' 2>/dev/null || echo "0")
-    DIFENSORI=$(curl -s "http://localhost:3000/api/players?position=D" | jq '. | length' 2>/dev/null || echo "0")
-    CENTROCAMPISTI=$(curl -s "http://localhost:3000/api/players?position=C" | jq '. | length' 2>/dev/null || echo "0")
-    ATTACCANTI=$(curl -s "http://localhost:3000/api/players?position=A" | jq '. | length' 2>/dev/null || echo "0")
+    TOTAL_PLAYERS=$(curl -s http://localhost:5001/api/players | jq '. | length' 2>/dev/null || echo "0")
+    PORTIERI=$(curl -s "http://localhost:5001/api/players?position=P" | jq '. | length' 2>/dev/null || echo "0")
+    DIFENSORI=$(curl -s "http://localhost:5001/api/players?position=D" | jq '. | length' 2>/dev/null || echo "0")
+    CENTROCAMPISTI=$(curl -s "http://localhost:5001/api/players?position=C" | jq '. | length' 2>/dev/null || echo "0")
+    ATTACCANTI=$(curl -s "http://localhost:5001/api/players?position=A" | jq '. | length' 2>/dev/null || echo "0")
     
     echo "🎯 Totale giocatori: $TOTAL_PLAYERS"
     echo "🥅 Portieri: $PORTIERI"
